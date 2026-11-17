@@ -1,0 +1,738 @@
+<title>Nota Okuyucu</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+/* Layout: tek sütun, telefon öncelikli; üstte çekim kartı, altında nota kağıdı + çalar, en altta son okunanlar */
+:root {
+  --bg: #f3f5f9;
+  --surface: #ffffff;
+  --ink: #141a2e;
+  --muted: #5a6178;
+  --line: #dce0ea;
+  --accent: #2b50d6;
+  --accent-ink: #ffffff;
+  --accent-soft: #e6ecfd;
+  --paper: #ffffff;
+  --paper-ink: #141a2e;
+  --note-on: #2b50d6;
+  --warn-bg: #fff4dc;
+  --warn-ink: #7a4d00;
+  --err-bg: #fde7e7;
+  --err-ink: #a1151b;
+  --font-display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --radius: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1120; --surface: #171b2e; --ink: #e8ecf6; --muted: #9ba2ba; --line: #2a3049;
+    --accent: #7e9bff; --accent-ink: #0e1120; --accent-soft: #222b4d;
+    --paper: #1c2136; --paper-ink: #e8ecf6; --note-on: #8fa9ff;
+    --warn-bg: #3a2d0e; --warn-ink: #f4c86c; --err-bg: #3d1719; --err-ink: #ff9ea0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1120; --surface: #171b2e; --ink: #e8ecf6; --muted: #9ba2ba; --line: #2a3049;
+  --accent: #7e9bff; --accent-ink: #0e1120; --accent-soft: #222b4d;
+  --paper: #1c2136; --paper-ink: #e8ecf6; --note-on: #8fa9ff;
+  --warn-bg: #3a2d0e; --warn-ink: #f4c86c; --err-bg: #3d1719; --err-ink: #ff9ea0;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding-block: 20px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 16px;
+}
+
+header h1 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1.1;
+  margin: 0;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+/* Beş çizgili porte motifi: başlığın altında */
+.staff {
+  height: 17px;
+  margin: 10px 0 8px;
+  background: repeating-linear-gradient(to bottom, var(--line) 0 1px, transparent 1px 4px);
+  max-width: 220px;
+}
+header p { margin: 0; color: var(--muted); max-width: 60ch; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.card h2 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  margin: 0;
+}
+.label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+button, .btn {
+  font: inherit;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 11px 16px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+button:disabled { opacity: 0.55; cursor: not-allowed; }
+button:focus-visible, .btn:focus-within, select:focus-visible, textarea:focus-visible, input:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  outline-offset: 2px;
+}
+.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.btn { position: relative; }
+.btn.disabled { opacity: 0.55; pointer-events: none; }
+svg.i { width: 20px; height: 20px; flex: none; }
+
+.hint { font-size: 0.88rem; color: var(--muted); margin: 0; }
+
+.preview {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+.preview img { display: block; width: 100%; max-height: 300px; object-fit: contain; }
+.scan {
+  position: absolute; left: 0; right: 0; height: 30%;
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--accent) 35%, transparent), transparent);
+  animation: scan 1.8s linear infinite;
+}
+@keyframes scan { from { top: -30%; } to { top: 100%; } }
+@media (prefers-reduced-motion: reduce) { .scan { animation: none; top: 35%; } }
+
+.status { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+.dots span {
+  display: inline-block; width: 6px; height: 6px; margin-right: 3px; border-radius: 50%;
+  background: var(--accent); animation: blink 1.2s infinite;
+}
+.dots span:nth-child(2) { animation-delay: .2s; } .dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes blink { 0%, 80%, 100% { opacity: .25 } 40% { opacity: 1 } }
+
+.alert { border-radius: 10px; padding: 10px 14px; margin: 0; }
+.alert.warn { background: var(--warn-bg); color: var(--warn-ink); }
+.alert.err { background: var(--err-bg); color: var(--err-ink); }
+ul.alert { padding-left: 32px; }
+
+.player-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.player-head h2 { min-width: 0; overflow-wrap: anywhere; }
+.meta { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.transport { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.transport .play { min-width: 120px; justify-content: center; }
+.toggle[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+.tempo { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; }
+.tempo input { width: 100%; accent-color: var(--accent); }
+.tempo output { font-family: var(--font-mono); font-size: 0.85rem; font-variant-numeric: tabular-nums; min-width: 7ch; text-align: right; }
+
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  min-height: 36px; padding: 6px 12px; border-radius: 999px; font-weight: 500; font-size: 0.9rem;
+}
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+
+.paper {
+  background: var(--paper);
+  color: var(--paper-ink);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 6px;
+  overflow-x: auto;
+  min-height: 120px;
+}
+.paper svg { color: var(--paper-ink); }
+.paper .abcjs-note_selected, .paper .abcjs-on { fill: var(--note-on); color: var(--note-on); }
+.paper .abcjs-on path { fill: var(--note-on); }
+
+details.editor summary { cursor: pointer; font-weight: 600; padding: 4px 0; }
+textarea {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  margin-top: 8px;
+  resize: vertical;
+}
+
+.recent { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.recent li { display: flex; gap: 8px; align-items: center; min-width: 0; }
+.recent .open {
+  flex: 1; min-width: 0; justify-content: space-between; text-align: left; font-weight: 500;
+}
+.recent .open span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recent .when { font-size: 0.8rem; color: var(--muted); flex: none; font-variant-numeric: tabular-nums; }
+.recent .del { min-width: 44px; justify-content: center; padding: 0; }
+.empty { color: var(--muted); font-size: 0.9rem; margin: 0; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Nota Okuyucu</h1>
+    <div class="staff" aria-hidden="true"></div>
+    <p>Nota kağıdının fotoğrafını çek. Notalar ekranda yeniden çizilir ve seçtiğin sazla çalınır.</p>
+  </header>
+
+  <section class="card" aria-labelledby="h-cek">
+    <h2 id="h-cek">Fotoğraf</h2>
+    <div class="row">
+      <label class="btn primary" id="camBtn">
+        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        Fotoğraf çek
+        <input id="camInput" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+      </label>
+      <label class="btn" id="galBtn">
+        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg>
+        Galeriden seç
+        <input id="galInput" type="file" accept="image/jpeg,image/png,image/webp">
+      </label>
+    </div>
+    <p class="hint">Kağıdı düz tut, gölge düşürme. En iyi sonuç için bir seferde 2–6 satır çek; basılı notalar el yazısından daha doğru okunur.</p>
+    <p class="alert warn" id="noSample" hidden>Fotoğraftan okuma bu sayfa claude.ai içinde açıldığında çalışır. Burada örnek notayı çalıp düzenleyebilirsin.</p>
+
+    <div class="preview" id="preview" hidden>
+      <img id="previewImg" alt="Seçilen nota fotoğrafı">
+      <div class="scan" id="scan" hidden></div>
+    </div>
+    <div class="status" id="status" hidden>
+      <span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span id="statusText">Notalar okunuyor…</span>
+      <button type="button" id="stopRead">Durdur</button>
+    </div>
+    <p class="alert err" id="readErr" role="alert" hidden></p>
+  </section>
+
+  <section class="card" aria-labelledby="pieceTitle">
+    <div class="player-head">
+      <h2 id="pieceTitle">Neşeye Övgü</h2>
+      <span class="meta" id="pieceMeta"></span>
+    </div>
+    <span class="label" id="sampleTag">Örnek nota</span>
+
+    <div class="transport">
+      <button type="button" class="primary play" id="playBtn" aria-label="Çal">
+        <svg class="i" id="playIcon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>
+        <span id="playLabel">Çal</span>
+      </button>
+      <button type="button" id="restartBtn" aria-label="Baştan çal">
+        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+        Baştan
+      </button>
+      <button type="button" class="toggle" id="loopBtn" aria-pressed="false">
+        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg>
+        Döngü
+      </button>
+    </div>
+
+    <div class="tempo">
+      <label for="tempo" class="label">Tempo</label>
+      <input id="tempo" type="range" min="40" max="160" step="5" value="100">
+      <output id="tempoOut" for="tempo">100 BPM</output>
+    </div>
+
+    <div>
+      <div class="label" id="sazLabel" style="margin-bottom:6px">Saz</div>
+      <div class="chips" role="group" aria-labelledby="sazLabel" id="chips"></div>
+    </div>
+
+    <div class="paper" id="paper" aria-live="polite"></div>
+
+    <ul class="alert warn" id="warnings" hidden></ul>
+
+    <details class="editor" id="editor">
+      <summary>Notayı düzelt (ABC metni)</summary>
+      <label for="abc" class="hint">Okumada hata varsa burada değiştir; nota hemen yeniden çizilir.</label>
+      <textarea id="abc" rows="10" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+    </details>
+  </section>
+
+  <section class="card" aria-labelledby="h-son">
+    <h2 id="h-son">Son okunanlar</h2>
+    <ul class="recent" id="recent"></ul>
+    <p class="empty" id="recentEmpty">Okuttuğun notalar burada, bu telefonda saklanır.</p>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/abcjs@6.4.4/dist/abcjs-basic-min.js"></script>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+
+  const SAMPLE = {
+    title: "Neşeye Övgü",
+    abc: `X:1
+T:Neşeye Övgü
+C:L. van Beethoven
+M:4/4
+L:1/8
+Q:1/4=100
+K:C
+E2 E2 F2 G2 | G2 F2 E2 D2 | C2 C2 D2 E2 | E3 D D4 |
+E2 E2 F2 G2 | G2 F2 E2 D2 | C2 C2 D2 E2 | D3 C C4 |]`,
+  };
+
+  // ---------- Saz sesleri (Web Audio ile sentez; dışarıdan ses dosyası gerekmez) ----------
+  const INSTRUMENTS = {
+    piyano: { label: "Piyano", waves: [["triangle", 1, 0.55], ["sine", 2, 0.18]], attack: 0.005, decay: 1.6, sustain: 0, release: 0.25, lp: 4200 },
+    gitar:  { label: "Gitar",  waves: [["triangle", 1, 0.5], ["sawtooth", 1, 0.06]], attack: 0.003, decay: 0.9, sustain: 0, release: 0.15, lp: 2600 },
+    keman:  { label: "Keman",  waves: [["sawtooth", 1, 0.22]], attack: 0.09, decay: 0, sustain: 1, release: 0.18, lp: 3200, vibrato: [5.5, 4] },
+    flut:   { label: "Flüt",   waves: [["sine", 1, 0.5], ["sine", 2, 0.05]], attack: 0.06, decay: 0, sustain: 1, release: 0.12, lp: 6000, vibrato: [5, 3] },
+    org:    { label: "Org",    waves: [["square", 1, 0.12], ["sine", 2, 0.15], ["sine", 0.5, 0.15]], attack: 0.02, decay: 0, sustain: 1, release: 0.08, lp: 2400 },
+  };
+
+  let audioCtx = null;
+  let master = null;
+  let instrument = "piyano";
+
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  }
+
+  function playNote(midi, when, dur, vol, out) {
+    const ins = INSTRUMENTS[instrument];
+    const freq = 440 * Math.pow(2, (midi - 69) / 12);
+    const g = audioCtx.createGain();
+    const lp = audioCtx.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.frequency.value = ins.lp;
+    g.connect(lp).connect(out);
+
+    const peak = 0.9 * vol;
+    const end = when + Math.max(0.05, dur);
+    g.gain.setValueAtTime(0.0001, when);
+    g.gain.exponentialRampToValueAtTime(peak, when + ins.attack);
+    if (ins.sustain) {
+      g.gain.setValueAtTime(peak, end);
+    } else {
+      g.gain.exponentialRampToValueAtTime(Math.max(0.0001, peak * 0.02), when + ins.attack + ins.decay);
+      g.gain.setValueAtTime(g.gain.value, end);
+    }
+    g.gain.exponentialRampToValueAtTime(0.0001, end + ins.release);
+    const stopAt = end + ins.release + 0.05;
+
+    let lfo = null;
+    if (ins.vibrato) {
+      lfo = audioCtx.createOscillator();
+      const lfoGain = audioCtx.createGain();
+      lfo.frequency.value = ins.vibrato[0];
+      lfoGain.gain.value = ins.vibrato[1];
+      lfo.connect(lfoGain);
+      lfo.start(when + 0.15);
+      lfo.stop(stopAt);
+      lfo._gain = lfoGain;
+    }
+    for (const [type, mult, level] of ins.waves) {
+      const o = audioCtx.createOscillator();
+      const og = audioCtx.createGain();
+      o.type = type;
+      o.frequency.value = freq * mult;
+      og.gain.value = level;
+      if (lfo) lfo._gain.connect(o.frequency);
+      o.connect(og).connect(g);
+      o.start(when);
+      o.stop(stopAt);
+    }
+  }
+
+  // ---------- Nota çizimi ve çalma ----------
+  let tune = null;
+  let timing = null;
+  let playing = false;
+  let positionMs = 0;
+  let startedAt = 0;
+  let baseBpm = 100;
+  let loop = false;
+  let playQpm = 100;
+  let current = { title: SAMPLE.title, abc: SAMPLE.abc, sample: true };
+
+  function bpm() {
+    return Math.round(baseBpm * Number($("tempo").value) / 100);
+  }
+
+  function clearHighlight() {
+    $("paper").querySelectorAll(".abcjs-on").forEach((el) => el.classList.remove("abcjs-on"));
+  }
+
+  function render() {
+    stop(true);
+    const abc = $("abc").value;
+    if (!window.ABCJS) {
+      $("paper").textContent = "Nota çizici yüklenemedi. İnternet bağlantını kontrol edip sayfayı yenile.";
+      return;
+    }
+    const res = ABCJS.renderAbc("paper", abc, { responsive: "resize", add_classes: true, paddingleft: 4, paddingright: 4 });
+    tune = res && res[0];
+    if (!tune || !tune.lines || !tune.lines.length) {
+      $("pieceMeta").textContent = "";
+      return;
+    }
+    // Zamanlama olaylarına nota perdelerini (midiPitches) ekler.
+    try { tune.setUpAudio({}); } catch (e) { console.warn("Ses verisi hazırlanamadı", e); }
+    baseBpm = Math.round(tune.getBpm()) || 100;
+    const meter = tune.getMeterFraction ? tune.getMeterFraction() : null;
+    const key = tune.getKeySignature ? tune.getKeySignature() : null;
+    const keyText = key && key.root && key.root !== "none" ? `${key.root}${key.acc === "sharp" ? "#" : key.acc === "flat" ? "b" : ""}${key.mode === "m" ? " minör" : " majör"}` : "";
+    $("pieceMeta").textContent = [meter ? `${meter.num}/${meter.den}` : "", keyText, `${baseBpm} BPM`].filter(Boolean).join(" · ");
+    updateTempoLabel();
+  }
+
+  function updateTempoLabel() {
+    $("tempoOut").textContent = `${bpm()} BPM`;
+  }
+
+  function setPlayUi(on) {
+    $("playLabel").textContent = on ? "Duraklat" : "Çal";
+    $("playBtn").setAttribute("aria-label", on ? "Duraklat" : "Çal");
+    $("playIcon").innerHTML = on
+      ? '<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>'
+      : '<path d="M7 4.5v15l13-7.5z"/>';
+  }
+
+  function play(fromMs) {
+    if (!tune) return;
+    const ctx = ensureAudio();
+    stop(true);
+    master = ctx.createGain();
+    master.gain.value = 0.35;
+    const comp = ctx.createDynamicsCompressor();
+    master.connect(comp).connect(ctx.destination);
+
+    playQpm = bpm();
+    timing = new ABCJS.TimingCallbacks(tune, {
+      qpm: playQpm,
+      eventCallback: (ev) => {
+        if (!ev) { finished(); return; }
+        clearHighlight();
+        (ev.elements || []).forEach((group) => group.forEach((el) => el.classList.add("abcjs-on")));
+      },
+    });
+
+    // Bütün notaları baştan AudioContext saatine yerleştir: zamanlama kaymaz.
+    const t0 = ctx.currentTime + 0.08;
+    for (const ev of timing.noteTimings) {
+      if (ev.type !== "event" || !ev.midiPitches || ev.milliseconds < fromMs) continue;
+      const when = t0 + (ev.milliseconds - fromMs) / 1000;
+      for (const p of ev.midiPitches) {
+        const dur = (p.duration * ev.millisecondsPerMeasure) / 1000;
+        playNote(p.pitch, when, dur * 0.97, Math.min(1, (p.volume || 90) / 110), master);
+      }
+    }
+    playing = true;
+    startedAt = performance.now() - fromMs;
+    timing.start(fromMs, "milliseconds");
+    setPlayUi(true);
+  }
+
+  function stop(resetPosition) {
+    if (timing) { timing.stop(); timing = null; }
+    if (master && audioCtx) {
+      const m = master;
+      m.gain.setTargetAtTime(0, audioCtx.currentTime, 0.02);
+      setTimeout(() => m.disconnect(), 200);
+      master = null;
+    }
+    if (playing && !resetPosition) positionMs = performance.now() - startedAt;
+    if (resetPosition) positionMs = 0;
+    playing = false;
+    clearHighlight();
+    setPlayUi(false);
+  }
+
+  function finished() {
+    stop(true);
+    if (loop) setTimeout(() => play(0), 150);
+  }
+
+  $("playBtn").addEventListener("click", () => {
+    if (playing) stop(false);
+    else play(positionMs);
+  });
+  $("restartBtn").addEventListener("click", () => play(0));
+  $("loopBtn").addEventListener("click", () => {
+    loop = !loop;
+    $("loopBtn").setAttribute("aria-pressed", String(loop));
+  });
+  $("tempo").addEventListener("input", () => {
+    updateTempoLabel();
+  });
+  $("tempo").addEventListener("change", () => {
+    // Çalarken tempo değişirse baştan değil, aynı yerden yeni tempoyla devam et.
+    if (playing) {
+      const ms = performance.now() - startedAt;
+      play(Math.max(0, (ms * playQpm) / bpm()));
+    } else if (positionMs) {
+      positionMs = (positionMs * playQpm) / bpm();
+      playQpm = bpm();
+    }
+  });
+
+  // Saz seçimi
+  for (const [id, ins] of Object.entries(INSTRUMENTS)) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip";
+    b.textContent = ins.label;
+    b.setAttribute("aria-pressed", String(id === instrument));
+    b.addEventListener("click", () => {
+      instrument = id;
+      document.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", "false"));
+      b.setAttribute("aria-pressed", "true");
+      if (playing) play(performance.now() - startedAt);
+      else {
+        // Kısa bir önizleme notası
+        const ctx = ensureAudio();
+        const out = ctx.createGain(); out.gain.value = 0.35; out.connect(ctx.destination);
+        playNote(67, ctx.currentTime + 0.02, 0.5, 0.8, out);
+        setTimeout(() => out.disconnect(), 1500);
+      }
+    });
+    $("chips").append(b);
+  }
+
+  // ABC düzenleme
+  let editTimer;
+  $("abc").addEventListener("input", () => {
+    clearTimeout(editTimer);
+    editTimer = setTimeout(() => {
+      render();
+      const t = (/^T:(.*)$/m.exec($("abc").value) || [])[1];
+      if (t) $("pieceTitle").textContent = t.trim();
+      if (!current.sample && current.id) {
+        current.abc = $("abc").value;
+        saveRecent(current);
+      }
+    }, 400);
+  });
+
+  function showPiece(piece) {
+    current = piece;
+    $("pieceTitle").textContent = piece.title || "Okunan nota";
+    $("sampleTag").hidden = !piece.sample;
+    $("abc").value = piece.abc;
+    const w = piece.warnings || [];
+    $("warnings").replaceChildren(...w.map((t) => Object.assign(document.createElement("li"), { textContent: t })));
+    $("warnings").hidden = !w.length;
+    render();
+  }
+
+  // ---------- Son okunanlar (yalnızca bu cihazda, tarayıcıda) ----------
+  const STORE_KEY = "nota-okuyucu:recent";
+  function loadRecent() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY) || "[]"); } catch { return []; }
+  }
+  function writeRecent(list) {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(list.slice(0, 25))); } catch {}
+    drawRecent();
+  }
+  function saveRecent(piece) {
+    const list = loadRecent().filter((p) => p.id !== piece.id);
+    list.unshift({ id: piece.id, title: piece.title, abc: piece.abc, warnings: piece.warnings || [], at: piece.at });
+    writeRecent(list);
+  }
+  function drawRecent() {
+    const list = loadRecent();
+    $("recentEmpty").hidden = list.length > 0;
+    const fmt = new Intl.DateTimeFormat("tr-TR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+    $("recent").replaceChildren(...list.map((p) => {
+      const li = document.createElement("li");
+      const open = document.createElement("button");
+      open.type = "button";
+      open.className = "open";
+      const name = document.createElement("span");
+      name.textContent = p.title || "Okunan nota";
+      const when = document.createElement("span");
+      when.className = "when";
+      when.textContent = fmt.format(new Date(p.at));
+      open.append(name, when);
+      open.addEventListener("click", () => {
+        showPiece({ ...p, sample: false });
+        $("pieceTitle").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "del";
+      del.setAttribute("aria-label", `${p.title || "Nota"} sil`);
+      del.innerHTML = '<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
+      del.addEventListener("click", () => writeRecent(loadRecent().filter((x) => x.id !== p.id)));
+      li.append(open, del);
+      return li;
+    }));
+  }
+
+  // ---------- Fotoğraftan okuma (Claude, görüntüleyenin kendi hesabıyla) ----------
+  const PROMPT = `Ekteki görsel bir nota kağıdının telefonla çekilmiş fotoğrafı. Görevin bu notayı ABC notasyonu standardı (v2.1) ile birebir yazıya dökmek.
+
+Kurallar:
+- Başlıkları her zaman yaz: X:1, T: (başlık), M: (ölçü), L: (varsayılan nota uzunluğu, genelde 1/8), Q: (tempo; yazılı değilse 1/4=100), K: (tonalite).
+- Donanımı (diyez/bemol sayısını) ve anahtarı dikkatle oku. Fa anahtarlı partide K: satırına "clef=bass" ekle.
+- Notaları, süreleri, noktalı değerleri, bağları, susları, arızaları (^ diyez, _ bemol, = natürel) ve ölçü çizgilerini doğru aktar. Tekrar işaretlerini (|: :|) ve volta parantezlerini koru.
+- Aynı anda çalınan birden çok porte varsa (ör. piyano sağ/sol el) %%score {V1 | V2} ile V:1, V:2 sesleri kullan.
+- Şarkı sözü varsa w: satırlarıyla ekle.
+- Fotoğraf eğik, bulanık ya da kesikse okuyabildiğin kadarını yaz; emin olmadığın yerleri warnings içinde kısa Türkçe cümlelerle belirt (ör. "3. ölçüdeki nota la veya si olabilir").
+- Görselde müzik notası yoksa recognized=false ver, abc boş olsun, warnings içinde ne gördüğünü kısaca söyle.
+
+Yalnızca şu biçimde tek bir JSON nesnesi döndür:
+{"recognized": true, "title": "Eserin adı ya da boş", "abc": "X:1\\nT:...\\n...", "warnings": ["..."]}`;
+
+  let sample = null;
+  let readCtl = null;
+
+  async function prepareImage(file) {
+    // Görseli makul boyuta indir ve JPEG yap (yüklemeyi hızlandırır).
+    const bitmap = await createImageBitmap(file).catch(() => null);
+    if (!bitmap) return file;
+    const max = 2400;
+    const s = Math.min(1, max / Math.max(bitmap.width, bitmap.height));
+    const c = document.createElement("canvas");
+    c.width = Math.round(bitmap.width * s);
+    c.height = Math.round(bitmap.height * s);
+    c.getContext("2d").drawImage(bitmap, 0, 0, c.width, c.height);
+    bitmap.close && bitmap.close();
+    return await new Promise((res) => c.toBlob((b) => res(b || file), "image/jpeg", 0.9));
+  }
+
+  function setReading(on) {
+    $("status").hidden = !on;
+    $("scan").hidden = !on;
+    $("camBtn").classList.toggle("disabled", on);
+    $("galBtn").classList.toggle("disabled", on);
+  }
+
+  const ERR_COPY = {
+    not_granted: "Claude'u kullanma izni verilmedi. Sayfadaki izin penceresinde izin verirsen okuma çalışır.",
+    sampling_disabled: "Bu hesapta Claude bu sayfa için kullanılamıyor.",
+    rate_limited: "Kullanım sınırına ulaşıldı. Biraz bekleyip tekrar dene.",
+    session_expired: "Oturumun kapanmış. claude.ai'ye yeniden giriş yapıp tekrar dene.",
+    image_rejected: "Bu görsel açılamadı. JPEG veya PNG bir fotoğraf seç.",
+    images_unavailable: "Bu görünümde fotoğraf gönderilemiyor. Sayfayı claude.ai uygulamasında ya da tarayıcıda aç.",
+    refused: "Bu görsel işlenemedi. Başka bir fotoğraf dene.",
+    invalid_json: "Okuma sonucu anlaşılamadı. Aynı fotoğrafı tekrar dene.",
+    empty_completion: "Sonuç boş döndü. Daha az satır içeren bir fotoğraf dene.",
+  };
+
+  async function readPhoto(file) {
+    if (!file) return;
+    $("readErr").hidden = true;
+    $("previewImg").src = URL.createObjectURL(file);
+    $("preview").hidden = false;
+    if (!sample) {
+      $("readErr").textContent = "Fotoğraftan okuma yalnızca bu sayfa claude.ai içinde açıldığında çalışır.";
+      $("readErr").hidden = false;
+      return;
+    }
+    stop(true);
+    setReading(true);
+    $("statusText").textContent = "Notalar okunuyor… (genelde 30–90 sn)";
+    readCtl = new AbortController();
+    try {
+      const img = await prepareImage(file);
+      const out = await sample.json(PROMPT, {
+        images: [img],
+        modelTier: "complex",
+        signal: readCtl.signal,
+        onText: () => { $("statusText").textContent = "Nota yazılıyor…"; },
+      });
+      const ok = out && typeof out === "object" && out.recognized !== false && typeof out.abc === "string" && /K:/.test(out.abc);
+      if (!ok) {
+        const why = Array.isArray(out?.warnings) && out.warnings.length ? ` (${out.warnings.join(" ")})` : "";
+        $("readErr").textContent = "Bu fotoğrafta nota bulunamadı. Notaları düz, net ve tam kadrajda çekip tekrar dene." + why;
+        $("readErr").hidden = false;
+        return;
+      }
+      const title = (typeof out.title === "string" && out.title.trim()) || (/^T:(.*)$/m.exec(out.abc) || [])[1]?.trim() || "Okunan nota";
+      const piece = {
+        id: String(Date.now()),
+        at: Date.now(),
+        title,
+        abc: out.abc.trim() + "\n",
+        warnings: Array.isArray(out.warnings) ? out.warnings.map(String).slice(0, 8) : [],
+        sample: false,
+      };
+      showPiece(piece);
+      saveRecent(piece);
+      $("pieceTitle").scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch (e) {
+      if (e && e.code === "cancelled") return;
+      $("readErr").textContent = ERR_COPY[e && e.code] || "Okuma sırasında bir sorun oldu. Bağlantını kontrol edip tekrar dene.";
+      $("readErr").hidden = false;
+    } finally {
+      setReading(false);
+      readCtl = null;
+    }
+  }
+
+  $("stopRead").addEventListener("click", () => readCtl && readCtl.abort());
+  for (const id of ["camInput", "galInput"]) {
+    $(id).addEventListener("change", (e) => {
+      const f = e.target.files && e.target.files[0];
+      e.target.value = "";
+      readPhoto(f);
+    });
+  }
+
+  // ---------- Başlangıç ----------
+  showPiece({ ...SAMPLE, sample: true });
+  drawRecent();
+
+  (async () => {
+    const s = window.claude && window.claude.use ? await window.claude.use("sample").catch(() => null) : null;
+    sample = s;
+    const limits = s ? await s.limits().catch(() => null) : null;
+    if (!s || !limits || !limits.images) {
+      sample = null;
+      $("noSample").hidden = false;
+      $("camBtn").classList.add("disabled");
+      $("galBtn").classList.add("disabled");
+    }
+  })();
+})();
+</script>
