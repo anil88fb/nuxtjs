@@ -7,7 +7,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "setup:omr": "bash scripts/setup-omr.sh"
+    "setup:omr": "node scripts/setup-omr.mjs",
+    "dev:telefon": "nuxt dev --host"
   },
   "devDependencies": {
     "@nuxt/devtools": "^1.0.3",

@@ -19,7 +19,10 @@ const TIMEOUT_MS = 180_000
 
 function homrBinary() {
   if (process.env.HOMR_BIN) return process.env.HOMR_BIN
-  const local = resolve(process.cwd(), '.venv-omr/bin/homr')
+  const local =
+    process.platform === 'win32'
+      ? resolve(process.cwd(), '.venv-omr/Scripts/homr.exe')
+      : resolve(process.cwd(), '.venv-omr/bin/homr')
   return existsSync(local) ? local : 'homr'
 }
 
@@ -79,7 +82,7 @@ export default defineEventHandler(async (event) => {
       if (err?.code === 'ENOENT') {
         throw createError({
           statusCode: 500,
-          statusMessage: 'Nota tanıma motoru kurulu değil. Sunucuda "pnpm setup:omr" çalıştırın.',
+          statusMessage: 'Nota tanıma motoru kurulu değil. Terminalde "pnpm setup:omr" komutunu çalıştır.',
         })
       }
       throw createError({

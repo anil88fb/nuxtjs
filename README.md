@@ -10,20 +10,44 @@ Nota kağıdının fotoğrafını telefon kamerasıyla çek; notalar ekranda yen
 4. [abcjs](https://www.abcjs.net/) ABC metnini porte üzerine çizer ve çalar. Çalan nota renklenir; tempo ve enstrüman değiştirilebilir.
 5. Okuma hatası olursa "Notayı düzelt" ile ABC metni elle düzenlenebilir.
 
-## Kurulum
+## Kurulum (bir kerelik)
 
-Gereksinimler: Node.js 18+, Python 3.10+
+1. **Node.js** kur: https://nodejs.org (LTS sürümü). Ardından terminalde `npm install -g pnpm` çalıştır.
+2. **Python 3.10+** kur: https://www.python.org/downloads/
+   Windows'ta kurulumun ilk ekranında **"Add Python to PATH"** kutusunu işaretle.
+3. Proje klasöründe terminal açıp şunları çalıştır:
 
 ```bash
 pnpm install
-pnpm setup:omr   # homr'u .venv-omr klasörüne kurar ve modelleri (~80 MB) indirir
+pnpm setup:omr   # nota tanıma motoru homr'u kurar ve modelleri (~80 MB) indirir
+```
+
+## Kullanım
+
+**Sadece bilgisayardan:**
+
+```bash
 pnpm dev
 ```
 
-homr başka bir yerde kuruluysa yolunu `HOMR_BIN` ortam değişkeniyle verebilirsin.
-Kurulum yapmadan da "Örnek notayı dene" butonuyla çizim ve çalma kısmı denenebilir.
+Tarayıcıda http://localhost:3000 adresini aç.
 
-> Not: Fotoğraf tanıma sunucu tarafında çalıştığı için uygulama `nuxt generate` ile statik olarak değil, sunuculu (`nuxt build`) ve Python kurulu bir sunucuda yayınlanmalıdır. Bir fotoğrafın okunması CPU'da yaklaşık 10–30 saniye sürer; istekler sırayla işlenir.
+**Telefonun kamerasıyla:** (telefon ve bilgisayar aynı Wi-Fi ağında olmalı)
+
+```bash
+pnpm dev:telefon
+```
+
+Terminalde çıkan **Network** adresini (ör. `http://192.168.1.20:3000`) telefonun tarayıcısında aç ya da terminaldeki QR kodu telefonla okut. "📷 Fotoğraf çek / seç" butonu telefonun kamerasını açar.
+
+> Windows ilk çalıştırmada güvenlik duvarı izni sorarsa "Özel ağlar" için izin ver; yoksa telefon bilgisayara bağlanamaz.
+
+## Bilinmesi gerekenler
+
+- Bir fotoğrafın okunması bilgisayarın hızına göre yaklaşık 10–30 saniye sürer.
+- En iyi sonuç basılı notalarda alınır; el yazısı notalar hatalı okunabilir. Hataları "Notayı düzelt" ile düzeltebilirsin.
+- homr başka bir yerde kuruluysa yolunu `HOMR_BIN` ortam değişkeniyle verebilirsin.
+- Kurulum yapmadan da "Örnek notayı dene" butonuyla çizim ve çalma kısmı denenebilir.
 
 ---
 
