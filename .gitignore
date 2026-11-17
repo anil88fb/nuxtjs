@@ -93,3 +93,6 @@ sw.*
 
 # Vercel
 .vercel
+
+# Nota tanıma (homr) sanal ortamı
+.venv-omr

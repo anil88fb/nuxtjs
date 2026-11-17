@@ -194,12 +194,13 @@ async function loadSample() {
       />
       <div class="actions">
         <button class="primary" :disabled="loading" @click="pickPhoto">
-          {{ loading ? 'Notalar okunuyor…' : '📷 Fotoğraf çek / seç' }}
+          {{ loading ? 'Notalar okunuyor… (10–30 sn)' : '📷 Fotoğraf çek / seç' }}
         </button>
         <button class="ghost" :disabled="loading" @click="loadSample">Örnek notayı dene</button>
       </div>
       <p class="hint">
-        İpucu: Kağıdı düz bir yüzeye koy, gölge düşürme ve porteleri yatay tut.
+        İpucu: Kağıdı düz bir yüzeye koy, gölge düşürme ve porteleri yatay tut. En iyi sonuç
+        basılı notalarda alınır; el yazısı notalar hatalı okunabilir.
       </p>
 
       <div v-if="previewUrl" class="preview">

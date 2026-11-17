@@ -1,121 +1,109 @@
-import Anthropic from '@anthropic-ai/sdk'
-import { betaZodOutputFormat } from '@anthropic-ai/sdk/helpers/beta/zod'
-import { z } from 'zod'
+import { spawn } from 'node:child_process'
+import { existsSync } from 'node:fs'
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join, resolve } from 'node:path'
 
-// Kamera fotoğrafındaki nota kağıdını ABC notasyonuna çeviren uç nokta.
-// ABC notasyonu tarayıcıda abcjs ile hem çizilir hem çalınır.
+// Kamera fotoğrafındaki nota kağıdını, sunucuda çalışan açık kaynak
+// nota tanıma (OMR) modeli homr ile okur. API anahtarı gerekmez.
+// homr MusicXML üretir; bunu abcjs'in çizip çalabileceği ABC notasyonuna çeviririz.
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'] as const
-type AllowedType = (typeof ALLOWED_TYPES)[number]
+const ALLOWED_TYPES: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+}
 
-// ~5 MB base64 (istemci görseli zaten küçültüyor)
-const MAX_BASE64_LENGTH = 7_000_000
+const MAX_BASE64_LENGTH = 14_000_000 // ~10 MB
+const TIMEOUT_MS = 180_000
 
-const SheetMusicSchema = z.object({
-  recognized: z
-    .boolean()
-    .describe('Görselde okunabilir nota (porte üzerinde müzik notası) varsa true'),
-  title: z.string().describe('Eserin adı; görselde yoksa boş string'),
-  abc: z
-    .string()
-    .describe('Tam ABC notasyonu (X:, T:, M:, L:, Q:, K: başlıkları dahil). recognized false ise boş string'),
-  warnings: z
-    .array(z.string())
-    .describe('Okunamayan ya da emin olunmayan yerler hakkında kısa Türkçe notlar'),
-})
+function homrBinary() {
+  if (process.env.HOMR_BIN) return process.env.HOMR_BIN
+  const local = resolve(process.cwd(), '.venv-omr/bin/homr')
+  return existsSync(local) ? local : 'homr'
+}
 
-const SYSTEM_PROMPT = `Sen bir optik nota tanıma (OMR) uzmanısın. Kullanıcı bir nota kağıdının fotoğrafını gönderir; görevin bu notayı ABC notasyonu standardı (v2.1) ile birebir yazıya dökmektir.
+// homr CPU'yu yoğun kullanır; aynı anda tek fotoğraf işlenir, diğerleri sıraya girer.
+let queue: Promise<unknown> = Promise.resolve()
+function enqueue<T>(job: () => Promise<T>): Promise<T> {
+  const run = queue.then(job, job)
+  queue = run.catch(() => {})
+  return run
+}
 
-Kurallar:
-- Başlıkları her zaman yaz: X:1, T: (başlık), M: (ölçü), L: (varsayılan nota uzunluğu), Q: (tempo, yoksa 1/4=100), K: (donanım/tonalite).
-- Donanımı (diyez/bemol sayısını) ve anahtarı dikkatle oku. Fa anahtarıyla yazılmış partilerde K: satırına "clef=bass" ekle.
-- Notaları, süreleri, noktalı değerleri, bağları, sus işaretlerini, arızaları (^ = _) ve ölçü çizgilerini doğru aktar. Tekrar işaretlerini (|: :|) ve volta parantezlerini koru.
-- Birden fazla porte aynı anda çalınıyorsa (ör. piyano sağ/sol el) V:1, V:2 sesleriyle yaz.
-- Şarkı sözü varsa w: satırlarıyla ekle.
-- Fotoğraf eğik, bulanık ya da kısmen kesikse okuyabildiğin kadarını yaz ve emin olmadığın yerleri warnings alanında Türkçe olarak belirt (ör. "3. ölçüdeki nota la veya si olabilir").
-- Görselde müzik notası yoksa recognized=false ver, abc boş olsun ve warnings içinde ne gördüğünü kısaca açıkla.
-- Çıktı yalnızca ABC notasyonu olsun; açıklama metnini abc alanına koyma.`
-
-let client: Anthropic | null = null
-function getClient() {
-  client ??= new Anthropic()
-  return client
+function runHomr(imagePath: string): Promise<void> {
+  return new Promise((resolvePromise, reject) => {
+    const child = spawn(homrBinary(), [imagePath], { stdio: ['ignore', 'ignore', 'pipe'] })
+    let stderr = ''
+    child.stderr.on('data', (d) => (stderr = (stderr + d).slice(-4000)))
+    const timer = setTimeout(() => {
+      child.kill('SIGKILL')
+      reject(new Error('homr zaman aşımına uğradı'))
+    }, TIMEOUT_MS)
+    child.on('error', (err) => {
+      clearTimeout(timer)
+      reject(err)
+    })
+    child.on('close', (code) => {
+      clearTimeout(timer)
+      if (code === 0) resolvePromise()
+      else reject(new Error(`homr ${code} koduyla çıktı: ${stderr}`))
+    })
+  })
 }
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{ image?: string; mediaType?: string }>(event)
-
   const image = body?.image
-  const mediaType = body?.mediaType as AllowedType | undefined
+  const ext = body?.mediaType ? ALLOWED_TYPES[body.mediaType] : undefined
 
   if (!image || typeof image !== 'string') {
     throw createError({ statusCode: 400, statusMessage: 'Görsel eksik.' })
   }
-  if (!mediaType || !ALLOWED_TYPES.includes(mediaType)) {
+  if (!ext) {
     throw createError({ statusCode: 400, statusMessage: 'Desteklenmeyen görsel türü.' })
   }
   if (image.length > MAX_BASE64_LENGTH) {
     throw createError({ statusCode: 413, statusMessage: 'Görsel çok büyük.' })
   }
 
+  const dir = await mkdtemp(join(tmpdir(), 'nota-'))
   try {
-    const response = await getClient().beta.messages.parse({
-      model: 'claude-opus-5-5',
-      max_tokens: 16000,
-      betas: ['server-side-fallback-2026-07-01'],
-      fallbacks: 'default',
-      output_config: {
-        effort: 'high',
-        format: betaZodOutputFormat(SheetMusicSchema),
-      },
-      system: SYSTEM_PROMPT,
-      messages: [
-        {
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: mediaType, data: image } },
-            { type: 'text', text: 'Bu fotoğraftaki notayı ABC notasyonuna çevir.' },
-          ],
-        },
-      ],
-    })
+    const imagePath = join(dir, `nota.${ext}`)
+    await writeFile(imagePath, Buffer.from(image, 'base64'))
 
-    if (response.stop_reason === 'refusal') {
-      throw createError({ statusCode: 422, statusMessage: 'Bu görsel işlenemedi.' })
-    }
-    if (response.stop_reason === 'max_tokens') {
+    try {
+      await enqueue(() => runHomr(imagePath))
+    } catch (err: any) {
+      console.error('Nota tanıma hatası', err)
+      if (err?.code === 'ENOENT') {
+        throw createError({
+          statusCode: 500,
+          statusMessage: 'Nota tanıma motoru kurulu değil. Sunucuda "pnpm setup:omr" çalıştırın.',
+        })
+      }
       throw createError({
         statusCode: 422,
-        statusMessage: 'Nota çok uzun; lütfen sayfanın bir bölümünü çekin.',
+        statusMessage: 'Fotoğrafta porte bulunamadı. Notaları düz, net ve tam kadrajda çekip tekrar dene.',
       })
     }
 
-    const parsed = response.parsed_output
-    if (!parsed) {
-      throw createError({ statusCode: 502, statusMessage: 'Yanıt çözümlenemedi.' })
+    const xmlPath = join(dir, 'nota.musicxml')
+    if (!existsSync(xmlPath)) {
+      return { recognized: false, title: '', abc: '', warnings: ['Fotoğrafta nota bulunamadı.'] }
     }
-    return parsed
-  } catch (error) {
-    if (error instanceof Anthropic.AuthenticationError) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Sunucuda ANTHROPIC_API_KEY tanımlı değil ya da geçersiz.',
-      })
+
+    const { abc, noteCount, title } = musicXmlToAbc(await readFile(xmlPath, 'utf8'))
+    if (!noteCount) {
+      return { recognized: false, title, abc: '', warnings: ['Fotoğrafta nota bulunamadı.'] }
     }
-    if (error instanceof Anthropic.RateLimitError) {
-      throw createError({ statusCode: 429, statusMessage: 'Çok fazla istek; biraz sonra tekrar deneyin.' })
+    return {
+      recognized: true,
+      title,
+      abc,
+      warnings: [] as string[],
     }
-    if (error instanceof Anthropic.APIError) {
-      console.error('Anthropic API hatası', error.status, error.message)
-      throw createError({ statusCode: 502, statusMessage: 'Nota tanıma servisine ulaşılamadı.' })
-    }
-    // Kendi fırlattığımız createError hatalarını olduğu gibi ilet.
-    if (isError(error)) throw error
-    // Ör. hiç kimlik bilgisi tanımlı değilse SDK istek göndermeden hata verir.
-    console.error('Nota tanıma hatası', error)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Sunucu yapılandırması eksik (ANTHROPIC_API_KEY tanımlı mı?).',
-    })
+  } finally {
+    await rm(dir, { recursive: true, force: true })
   }
 })

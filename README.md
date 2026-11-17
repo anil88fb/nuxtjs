@@ -5,21 +5,25 @@ Nota kağıdının fotoğrafını telefon kamerasıyla çek; notalar ekranda yen
 ## Nasıl çalışır?
 
 1. `pages/index.vue` fotoğrafı tarayıcıda küçültür ve `/api/recognize` uç noktasına gönderir.
-2. `server/api/recognize.post.ts` görseli Claude'a (`claude-opus-5-5`) yollar ve notayı [ABC notasyonu](https://abcnotation.com/wiki/abc:standard:v2.1) olarak geri alır.
-3. [abcjs](https://www.abcjs.net/) ABC metnini porte üzerine çizer ve çalar. Çalan nota renklenir; tempo ve enstrüman değiştirilebilir.
-4. Okuma hatası olursa "Notayı düzelt" ile ABC metni elle düzenlenebilir.
+2. `server/api/recognize.post.ts` görseli sunucuda çalışan açık kaynak nota tanıma motoru [homr](https://github.com/liebharc/homr) ile okur. **API anahtarı gerekmez, ücretsizdir.**
+3. homr'un ürettiği MusicXML, `server/utils/musicxml-to-abc.ts` ile [ABC notasyonuna](https://abcnotation.com/wiki/abc:standard:v2.1) çevrilir.
+4. [abcjs](https://www.abcjs.net/) ABC metnini porte üzerine çizer ve çalar. Çalan nota renklenir; tempo ve enstrüman değiştirilebilir.
+5. Okuma hatası olursa "Notayı düzelt" ile ABC metni elle düzenlenebilir.
 
 ## Kurulum
 
+Gereksinimler: Node.js 18+, Python 3.10+
+
 ```bash
 pnpm install
-cp .env.example .env   # ANTHROPIC_API_KEY değerini doldur
+pnpm setup:omr   # homr'u .venv-omr klasörüne kurar ve modelleri (~80 MB) indirir
 pnpm dev
 ```
 
-API anahtarı olmadan da "Örnek notayı dene" butonuyla çizim ve çalma kısmı denenebilir.
+homr başka bir yerde kuruluysa yolunu `HOMR_BIN` ortam değişkeniyle verebilirsin.
+Kurulum yapmadan da "Örnek notayı dene" butonuyla çizim ve çalma kısmı denenebilir.
 
-> Not: Fotoğraf tanıma sunucu tarafında çalıştığı için uygulama `nuxt generate` ile statik olarak değil, sunuculu (`nuxt build`) yayınlanmalıdır.
+> Not: Fotoğraf tanıma sunucu tarafında çalıştığı için uygulama `nuxt generate` ile statik olarak değil, sunuculu (`nuxt build`) ve Python kurulu bir sunucuda yayınlanmalıdır. Bir fotoğrafın okunması CPU'da yaklaşık 10–30 saniye sürer; istekler sırayla işlenir.
 
 ---
 
