@@ -93,3 +93,9 @@ sw.*
 
 # Vercel
 .vercel
+
+# daily shorts outputs
+shorts/episodes/*/*.mp4
+shorts/episodes/*/sheet.jpg
+shorts/episodes/*/prev_*.jpg
+shorts/episodes/*/_*
