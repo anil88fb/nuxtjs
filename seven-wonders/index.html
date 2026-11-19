@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#000;font-family:'Inter Display','Inter',sans-serif;color:#fff}
+  #c{position:absolute;inset:0}
+  .ov{position:absolute;inset:0;pointer-events:none}
+  #vignette{background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 45%,rgba(0,0,0,.55) 100%)}
+  #grad{background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,0) 26%,rgba(0,0,0,0) 52%,rgba(0,0,0,.78) 100%)}
+  #flash{background:#fff;opacity:0}
+  #black{background:#000;opacity:0}
+  #top{position:absolute;left:72px;right:72px;top:150px}
+  #badge{display:inline-flex;align-items:center;gap:14px;font:600 34px 'Inter';letter-spacing:6px;text-transform:uppercase;color:#ffd98a}
+  #badge b{display:inline-block;width:70px;height:3px;background:#ffd98a}
+  #title{font:800 128px/1.0 'Inter Display';margin-top:26px;letter-spacing:-2px;text-shadow:0 8px 40px rgba(0,0,0,.6)}
+  #title span{display:inline-block}
+  #loc{font:500 42px 'Inter';margin-top:22px;color:rgba(255,255,255,.88);letter-spacing:1px}
+  #loc i{font-style:normal;color:#ffd98a}
+  #card{position:absolute;left:60px;right:60px;bottom:210px;padding:44px 48px 30px;border-radius:40px;
+        background:linear-gradient(160deg,rgba(255,255,255,.16),rgba(255,255,255,.05));border:1.5px solid rgba(255,255,255,.28);
+        box-shadow:0 30px 80px rgba(0,0,0,.45);backdrop-filter:blur(18px)}
+  .fact{display:flex;gap:26px;align-items:flex-start;margin-bottom:24px}
+  .fact .k{flex:0 0 76px;height:76px;border-radius:22px;background:rgba(255,217,138,.18);border:1.5px solid rgba(255,217,138,.6);
+           display:flex;align-items:center;justify-content:center;font:700 30px 'Inter';color:#ffd98a}
+  .fact .t{font:500 40px/1.28 'Inter';color:#fff}
+  .fact .t strong{color:#ffd98a;font-weight:700}
+  #dots{position:absolute;left:0;right:0;bottom:120px;display:flex;justify-content:center;gap:18px}
+  #dots div{width:16px;height:16px;border-radius:9px;background:rgba(255,255,255,.35)}
+  #dots div.on{width:56px;background:#ffd98a}
+  #intro,#outro{position:absolute;left:70px;right:70px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+  .big7{font:900 520px/0.9 'Inter Display';background:linear-gradient(180deg,#fff3cf,#ffb648 60%,#c76b12);-webkit-background-clip:text;color:transparent;filter:drop-shadow(0 20px 60px rgba(255,170,60,.45))}
+  .h1{font:800 104px/1.02 'Inter Display';letter-spacing:-1px}
+  .h2{font:500 44px/1.35 'Inter';color:rgba(255,255,255,.85);margin-top:30px}
+  .pill{margin-top:44px;font:600 34px 'Inter';padding:18px 36px;border-radius:60px;border:1.5px solid rgba(255,217,138,.7);color:#ffd98a;letter-spacing:2px}
+  #grid{display:grid;grid-template-columns:1fr 1fr;gap:18px 26px;margin-top:50px;text-align:left}
+  #grid div{font:600 38px 'Inter';color:#fff}
+  #grid div i{font-style:normal;color:#ffd98a;margin-right:12px}
+</style></head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<div class="ov" id="vignette"></div>
+<div class="ov" id="grad"></div>
+<div class="ov" id="scene">
+  <div id="top"><div id="badge"><b></b><span id="num">01 / 07</span></div><div id="title"></div><div id="loc"></div></div>
+  <div id="card"></div>
+  <div id="dots"></div>
+</div>
+<div class="ov" id="intro">
+  <div class="h2" id="i0" style="margin:0 0 10px;letter-spacing:8px;font-weight:600;color:#ffd98a">DÜNYANIN YENİ</div>
+  <div class="big7" id="i1">7</div>
+  <div class="h1" id="i2">HARİKASI</div>
+  <div class="h2" id="i3">2007'de dünya çapında 100 milyondan fazla oyla seçildi</div>
+</div>
+<div class="ov" id="outro">
+  <div class="h1" id="o1">Hangisini<br>görmek istersin?</div>
+  <div id="grid"></div>
+  <div class="pill" id="o2">YORUMLARA YAZ ✦</div>
+</div>
+<div class="ov" id="black"></div>
+<div class="ov" id="flash"></div>
+
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+
+// ---------- data ----------
+const W = [
+ {name:'Çin Seddi', loc:'Çin', era:'MÖ 7. yy – MS 17. yy', facts:[
+   'Toplam uzunluğu yaklaşık <strong>21.196 km</strong>',
+   'En sağlam bölümleri <strong>Ming Hanedanı</strong> döneminden kalma',
+   'Uzaydan çıplak gözle görüldüğü bir <strong>efsanedir</strong>']},
+ {name:'Petra', loc:'Ürdün', era:'MÖ 4. yy · Nebatiler', facts:[
+   'Kızıl kayalara oyulmuş <strong>“Gül Kenti”</strong>',
+   'El-Hazne cephesi yaklaşık <strong>40 metre</strong> yüksekliğinde',
+   '1985’ten beri <strong>UNESCO</strong> Dünya Mirası']},
+ {name:'Kurtarıcı İsa', loc:'Rio de Janeiro, Brezilya', era:'1922 – 1931', facts:[
+   'Heykel <strong>30 m</strong>, kaidesiyle birlikte <strong>38 m</strong>',
+   'Kol açıklığı tam <strong>28 metre</strong>',
+   '<strong>700 m</strong> yükseklikteki Corcovado Dağı’nın zirvesinde']},
+ {name:'Machu Picchu', loc:'Cusco, Peru', era:'1450 civarı · İnkalar', facts:[
+   'And Dağları’nda <strong>2.430 m</strong> rakımda',
+   'Taşlar <strong>harç kullanılmadan</strong> kusursuzca birleştirilmiş',
+   '<strong>1911</strong>’de Hiram Bingham dünyaya tanıttı']},
+ {name:'Chichen Itza', loc:'Yucatán, Meksika', era:'MS 600 – 1200 · Mayalar', facts:[
+   'El Castillo piramidi <strong>30 m</strong> yüksekliğinde',
+   'Toplam <strong>365 basamak</strong>: yılın her günü için bir tane',
+   'Ekinokslarda merdivenden <strong>yılan gölgesi</strong> iner']},
+ {name:'Kolezyum', loc:'Roma, İtalya', era:'MS 70 – 80', facts:[
+   'Antik dünyanın <strong>en büyük</strong> amfitiyatrosu',
+   '<strong>50.000+</strong> seyirci kapasitesi',
+   'Gladyatör dövüşlerine <strong>400 yıl</strong> ev sahipliği yaptı']},
+ {name:'Tac Mahal', loc:'Agra, Hindistan', era:'1632 – 1653', facts:[
+   'Şah Cihan’ın eşi <strong>Mümtaz Mahal</strong> anısına yaptırdığı anıt mezar',
+   'Yaklaşık <strong>20.000 usta</strong> 21 yılda tamamladı',
+   'Beyaz mermeri gün boyu <strong>renk değiştirir</strong>']},
+];
+const T_INTRO = 3.5, T_SCENE = 7.5, T_OUTRO = 4, TOTAL = T_INTRO + 7*T_SCENE + T_OUTRO;
+window.TOTAL = TOTAL;
+
+// ---------- helpers ----------
+let seed = 7; const rnd = () => (seed = (seed*16807) % 2147483647, (seed-1)/2147483646);
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const ease=x=>{x=clamp(x);return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2};
+const eout=x=>{x=clamp(x);return 1-Math.pow(1-x,3)};
+const eback=x=>{x=clamp(x);const c=1.7;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
+const M = (c,o={}) => new THREE.MeshStandardMaterial({color:c,flatShading:true,roughness:o.r??.85,metalness:o.m??0,emissive:o.e??0,emissiveIntensity:o.ei??1,transparent:o.t??false,opacity:o.o??1});
+function box(g,w,h,d,mat,x,y,z,ry=0){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.rotation.y=ry;m.castShadow=m.receiveShadow=true;g.add(m);return m}
+function cyl(g,rt,rb,h,seg,mat,x,y,z){const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg),mat);m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;g.add(m);return m}
+function terrain(size,seg,hf,mat){const g=new THREE.PlaneGeometry(size,size,seg,seg);g.rotateX(-Math.PI/2);const p=g.attributes.position;
+  for(let i=0;i<p.count;i++){p.setY(i,hf(p.getX(i),p.getZ(i)))}g.computeVertexNormals();const m=new THREE.Mesh(g,mat);m.receiveShadow=true;return m}
+function mountains(g,n,r0,r1,hmin,hmax,col,snow){for(let i=0;i<n;i++){const a=rnd()*Math.PI*2,r=r0+rnd()*(r1-r0),h=hmin+rnd()*(hmax-hmin);
+  const m=cyl(g,0,h*(.5+rnd()*.5),h,5+Math.floor(rnd()*3),M(col),Math.cos(a)*r,h/2-2,Math.sin(a)*r);m.rotation.y=rnd()*6;
+  if(snow){const s=cyl(g,0,h*.18,h*.3,m.geometry.parameters.radialSegments,M(0xffffff),m.position.x,h-2-h*.15+0.05,m.position.z);s.scale.set(1.03*(m.geometry.parameters.radiusBottom/h)/0.6,1,1.03*(m.geometry.parameters.radiusBottom/h)/0.6);s.rotation.y=m.rotation.y}}}
+function trees(g,n,r0,r1,col,yf=()=>0,avoid=()=>false){for(let i=0;i<n;i++){const a=rnd()*Math.PI*2,r=r0+rnd()*(r1-r0);const x=Math.cos(a)*r,z=Math.sin(a)*r;if(avoid(x,z))continue;
+  const s=.7+rnd()*1.1;const y=yf(x,z);cyl(g,0,.9*s,2.6*s,6,M(col),x,y+1.6*s,z);cyl(g,.12*s,.15*s,.7*s,5,M(0x5a3b22),x,y+.3*s,z)}}
+function cloud(g,x,y,z,s,op=.9){const c=new THREE.Group();const mat=M(0xffffff,{t:true,o:op,r:1});for(let i=0;i<6;i++){const m=new THREE.Mesh(new THREE.IcosahedronGeometry((1+rnd())*s,1),mat);m.position.set((rnd()-.5)*4*s,(rnd()-.3)*s,(rnd()-.5)*2*s);c.add(m)}c.position.set(x,y,z);g.add(c);return c}
+
+// ---------- renderer ----------
+const renderer = new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(1);renderer.setSize(1080,1920,false);
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;renderer.outputColorSpace=THREE.SRGBColorSpace;
+const camera = new THREE.PerspectiveCamera(50,1080/1920,.1,2000);
+
+// sky shader
+function makeSky(top,bot,sunDir,sunCol){const mat=new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,fog:false,
+  uniforms:{top:{value:new THREE.Color(top)},bot:{value:new THREE.Color(bot)},sd:{value:new THREE.Vector3(...sunDir).normalize()},sc:{value:new THREE.Color(sunCol)}},
+  vertexShader:`varying vec3 vp;void main(){vp=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`uniform vec3 top,bot,sc,sd;varying vec3 vp;void main(){float h=clamp(vp.y*1.4+.15,0.,1.);vec3 c=mix(bot,top,pow(h,.8));
+   float s=max(dot(vp,sd),0.);c+=sc*(pow(s,600.)*3.+pow(s,24.)*.45+pow(s,4.)*.15);gl_FragColor=vec4(c,1.);}`});
+  return new THREE.Mesh(new THREE.SphereGeometry(900,32,16),mat)}
+
+// particles (dust / sparkles), one set per scene
+function particles(g,n,spread,col,size){const geo=new THREE.BufferGeometry();const a=new Float32Array(n*3);
+  for(let i=0;i<n;i++){a[i*3]=(rnd()-.5)*spread;a[i*3+1]=rnd()*spread*.5;a[i*3+2]=(rnd()-.5)*spread}
+  geo.setAttribute('position',new THREE.BufferAttribute(a,3));
+  const cv=document.createElement('canvas');cv.width=cv.height=64;const x=cv.getContext('2d');const gr=x.createRadialGradient(32,32,0,32,32,32);
+  gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.3,'rgba(255,255,255,.5)');gr.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=gr;x.fillRect(0,0,64,64);
+  const p=new THREE.Points(geo,new THREE.PointsMaterial({color:col,size,map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.8}));
+  p.userData.base=a.slice();g.add(p);return p}
+
+const scenes=[];
+function mkScene({sky,fog,fogD,sun,sunCol,sunI,amb,hemi}){const s=new THREE.Scene();s.add(makeSky(sky[0],sky[1],sun,sunCol));
+  s.fog=new THREE.Fog(fog,fogD[0],fogD[1]);
+  const L=new THREE.DirectionalLight(sunCol,sunI);L.position.set(sun[0]*80,sun[1]*80,sun[2]*80);L.castShadow=true;L.shadow.mapSize.set(2048,2048);
+  const sc=L.shadow.camera;sc.left=sc.bottom=-60;sc.right=sc.top=60;sc.far=300;L.shadow.bias=-.0005;s.add(L);
+  s.add(new THREE.HemisphereLight(hemi[0],hemi[1],amb));const g=new THREE.Group();s.add(g);return {s,g,upd:[]}}
+
+// ===== 1. Great Wall =====
+{const S=mkScene({sky:[0x5d8fd6,0xf3d9b0],fog:0xd9cdb5,fogD:[40,260],sun:[-.5,.35,-.6],sunCol:0xffe2b0,sunI:2.6,amb:.9,hemi:[0xcfe3ff,0x6b5a3a]});const g=S.g;
+ const ridge=x=>8*Math.sin(x*0.055)+4*Math.sin(x*.13+1);const pathZ=x=>14*Math.sin(x*.035);
+ const hf=(x,z)=>{const d=z-pathZ(x);return ridge(x)+4-0.012*d*d*1.2+2.5*Math.sin(x*.21)*Math.cos(z*.17)};
+ g.add(terrain(420,140,(x,z)=>Math.max(hf(x,z),-25+3*Math.sin(x*.1+z*.1)),M(0x6f8a3c)));
+ const stone=M(0xb9a27c),dark=M(0x8d7756);
+ let prev=null;for(let x=-150;x<=150;x+=2){const z=pathZ(x),y=hf(x,z);const p=new THREE.Vector3(x,y,z);
+   if(prev){const mid=p.clone().add(prev).multiplyScalar(.5);const len=p.distanceTo(prev);const m=box(g,len+.2,3.2,2.2,stone,mid.x,mid.y+.4,mid.z);m.lookAt(p.x,mid.y+.4,p.z);m.rotateY(Math.PI/2);
+     const pitch=Math.atan2(p.y-prev.y,Math.hypot(p.x-prev.x,p.z-prev.z));m.rotateZ(pitch);
+     for(const sd of[-1,1]){const c=box(g,.6,.7,.3,dark,0,0,0);c.position.copy(mid);c.position.y+=2.2;const n=new THREE.Vector3(-(p.z-prev.z),0,p.x-prev.x).normalize();c.position.addScaledVector(n,sd*1.0);c.rotation.y=m.rotation.y}}
+   if(Math.round(x)%24===0){box(g,4,6,4,stone,x,y+2,z);box(g,4.6,.6,4.6,dark,x,y+5.2,z);for(let k=0;k<4;k++){const a=k*Math.PI/2;box(g,1,1,1,dark,x+Math.cos(a)*1.9,y+6,z+Math.sin(a)*1.9)}}
+   prev=p}
+ mountains(g,26,150,320,40,110,0x5f7a58,false);
+ trees(g,160,10,120,0x3d5e2a,(x,z)=>hf(x,z)-1,(x,z)=>Math.abs(z-pathZ(x))<6);
+ const pt=particles(g,500,200,0xfff0c8,1.2);
+ S.cam=(p)=>{const x=-70+p*95;const z=pathZ(x);return{pos:[x-8,hf(x,z)+16-p*6,z+30-p*8],look:[x+30,hf(x+30,pathZ(x+30))+2,pathZ(x+30)]}};
+ S.upd.push(t=>{pt.rotation.y=t*.02});scenes.push(S)}
+
+// ===== 2. Petra =====
+{const S=mkScene({sky:[0x3e6db8,0xf2b98a],fog:0xd99a72,fogD:[30,220],sun:[.6,.55,.5],sunCol:0xffc890,sunI:3,amb:.8,hemi:[0xffd7b8,0x7a3c2a]});const g=S.g;
+ const rose=M(0xc8775a),rose2=M(0xb3624a),rose3=M(0xdb9172);
+ // canyon walls
+ for(const sd of[-1,1])for(let i=0;i<14;i++){box(g,10+rnd()*8,50+rnd()*30,8+rnd()*6,i%2?rose2:rose,sd*(16+rnd()*6),20,30-i*9,rnd()*.4-.2)}
+ box(g,80,70,10,rose2,0,30,-9);
+ const ground=terrain(300,60,(x,z)=>.4*Math.sin(x*.3)*Math.cos(z*.2),M(0xd7a17a));g.add(ground);
+ const F=new THREE.Group();g.add(F);
+ box(F,30,2,4,rose3,0,1,-2);
+ for(let i=0;i<6;i++){const x=-11.25+i*4.5;cyl(F,.75,.8,14,14,rose3,x,9,0);box(F,2,1,2,rose3,x,16.4,0);box(F,2,1,2,rose3,x,1.5,0)}
+ box(F,28,2.4,3,rose3,0,18,0);
+ const ped=new THREE.Mesh(new THREE.CylinderGeometry(9,9,2.5,3,1),rose3);ped.rotation.set(Math.PI/2,0,Math.PI/2);ped.scale.set(.42,1,1.5);ped.position.set(0,21.6,.2);ped.castShadow=true;F.add(ped);
+ box(F,28,1.6,3,rose2,0,24.8,-.4);
+ // upper level
+ cyl(F,3,3,13,18,rose3,0,32.5,-1);
+ for(let i=0;i<8;i++){const a=i/8*Math.PI*2;if(Math.sin(a)<-.3)continue;cyl(F,.55,.6,12,10,rose3,Math.cos(a)*4,32,Math.sin(a)*4-1)}
+ cyl(F,4.6,4.6,1.2,20,rose3,0,39,-1);const roof=cyl(F,0,4.4,4,20,rose3,0,41.6,-1);cyl(F,.7,1,2.5,10,rose3,0,44.6,-1);
+ for(const sd of[-1,1]){for(let k=0;k<3;k++)cyl(F,.55,.6,12,10,rose3,sd*(8+k*2.6),32,0);box(F,9,1.6,3,rose3,sd*10.6,38.8,0);
+   const hp=new THREE.Mesh(new THREE.CylinderGeometry(4,4,2.5,3,1),rose3);hp.rotation.set(Math.PI/2,0,Math.PI/2);hp.scale.set(.5,1,1);hp.position.set(sd*12,41.2,0);F.add(hp)}
+ for(let i=-1;i<=1;i+=2)box(F,3.2,8,1.5,M(0x5a2a20),i*4.5*1.5,4,-.9);box(F,3.6,10,1.5,M(0x3a1a14),0,5,-.9);
+ F.position.set(0,0,-3);
+ const pt=particles(g,400,120,0xffc79a,.9);
+ S.cam=(p)=>({pos:[Math.sin(p*1.2-.6)*26,8+p*12,92-p*22],look:[0,20+p*4,-4]});
+ S.upd.push(t=>{pt.rotation.y=t*.03;pt.position.y=Math.sin(t)*2});scenes.push(S)}
+
+// ===== 3. Christ the Redeemer =====
+{const S=mkScene({sky:[0x2d6ed6,0xbfe3ff],fog:0xcfe6ff,fogD:[60,420],sun:[-.5,.55,-.7],sunCol:0xfff0d8,sunI:3.2,amb:1,hemi:[0xdff0ff,0x3d6a3a]});const g=S.g;
+ const mt=new THREE.Mesh(new THREE.IcosahedronGeometry(1,2),M(0x3f7a3a));const pos=mt.geometry.attributes.position;
+ for(let i=0;i<pos.count;i++){const v=new THREE.Vector3().fromBufferAttribute(pos,i);const k=1+.18*Math.sin(v.x*5)*Math.cos(v.z*4);pos.setXYZ(i,v.x*k,v.y*k,v.z*k)}mt.geometry.computeVertexNormals();
+ mt.scale.set(40,60,40);mt.position.set(0,-60,0);mt.receiveShadow=true;g.add(mt);
+ const rock=M(0x8b8478);cyl(g,5,9,8,7,rock,0,-1,0);
+ const soap=M(0xe9e3d2,{r:.6});const st=new THREE.Group();g.add(st);
+ box(st,4.2,4,4.2,soap,0,5,0);box(st,4.8,.6,4.8,soap,0,7.2,0);
+ cyl(st,1.15,2.1,15,14,soap,0,15,0);
+ cyl(st,1.25,1.15,3.5,14,soap,0,23.6,0);
+ box(st,28,1.6,1.4,soap,0,24.2,0);
+ for(const sd of[-1,1]){const sl=new THREE.Mesh(new THREE.BoxGeometry(12,2.2,1.2),soap);sl.position.set(sd*7.5,23.4,0);sl.rotation.z=sd*-.08;sl.castShadow=true;st.add(sl);box(st,1,1,1,soap,sd*14.4,24.2,0)}
+ const head=new THREE.Mesh(new THREE.SphereGeometry(1.25,16,12),soap);head.position.set(0,27,0);head.scale.set(1,1.2,1);head.castShadow=true;st.add(head);
+ st.scale.setScalar(.65);st.position.y=2;
+ // sea + sugarloaf
+ const sea=new THREE.Mesh(new THREE.PlaneGeometry(2000,2000),M(0x1f5f9a,{r:.25,m:.3}));sea.rotation.x=-Math.PI/2;sea.position.y=-55;g.add(sea);
+ const sl=cyl(g,6,22,46,9,M(0x4b6e3e),70,-33,-110);sl.scale.z=1.2;cyl(g,3,12,28,8,M(0x50733f),40,-42,-140);
+ mountains(g,22,160,360,30,90,0x4f7f5a,false);
+ const clouds=[];for(let i=0;i<14;i++){const a=rnd()*Math.PI*2,r=30+rnd()*70;clouds.push(cloud(g,Math.cos(a)*r,-14-rnd()*20,Math.sin(a)*r,3+rnd()*3,.8))}
+ const pt=particles(g,300,150,0xffffff,.8);
+ S.cam=(p)=>{const a=-1.9+p*1.5;const r=52-p*14;return{pos:[Math.cos(a)*r,4+p*14,Math.sin(a)*r],look:[0,11+p*2,0]}};
+ S.upd.push(t=>{clouds.forEach((c,i)=>{c.position.x+=0;c.rotation.y=t*.05*(i%2?1:-1);c.position.y=-18+Math.sin(t*.6+i)*2})});
+ S.upd.push(t=>{pt.rotation.y=-t*.03});scenes.push(S)}
+
+// ===== 4. Machu Picchu =====
+{const S=mkScene({sky:[0x7d9fc2,0xe8eef0],fog:0xdfe6e6,fogD:[40,240],sun:[.4,.6,.6],sunCol:0xfff2d8,sunI:2.6,amb:1,hemi:[0xe8f2ff,0x3f5a2a]});const g=S.g;
+ const hf=(x,z)=>{const r=Math.hypot(x*.9,z);return 22-0.004*r*r*1.4+1.5*Math.sin(x*.2)*Math.cos(z*.25)-Math.max(0,r-60)*0.8};
+ g.add(terrain(500,120,(x,z)=>Math.max(hf(x,z),-70),M(0x4f7b38)));
+ const grass=M(0x6fa043),stone=M(0x9c9486),roofc=M(0x8a6a3a);
+ for(let i=0;i<9;i++){const y=22-i*2.4;const w=60-i*1.5,d=8;box(g,w,2.4,d,stone,0,y-1.2+0.6,30+i*5.5).scale.y=1;box(g,w,.3,d-.6,grass,0,y+.75,30+i*5.5)}
+ for(let i=0;i<8;i++){box(g,6,2.2,40-i*3,stone,-34-i*4.5,22-i*2.4-0.6,0);box(g,5.4,.3,40-i*3,grass,-34-i*4.5,22-i*2.4+.6,0)}
+ box(g,58,1.2,50,M(0x79a24b),0,22.2,-2);
+ for(let i=0;i<22;i++){const x=(rnd()-.5)*44,z=(rnd()-.5)*36,w=3+rnd()*3,d=3+rnd()*2;box(g,w,2.4,d,stone,x,24,z,Math.round(rnd())*Math.PI/2);
+   if(rnd()<.55){const r=new THREE.Mesh(new THREE.CylinderGeometry(w*.62,w*.62,d,3),roofc);r.rotation.set(Math.PI/2,0,Math.PI/2);r.scale.set(.6,1,1);r.position.set(x,26.1,z);r.castShadow=true;g.add(r)}}
+ // Huayna Picchu
+ const hp=cyl(g,1.5,26,72,8,M(0x3a6a2c),0,10,-70);hp.rotation.y=.3;cyl(g,1,16,50,7,M(0x44743a),-28,0,-55);
+ mountains(g,30,140,330,60,160,0x52705a,true);
+ const mist=[];for(let i=0;i<10;i++){const c=cloud(g,(rnd()-.5)*160,6+rnd()*10,(rnd()-.5)*160,5+rnd()*4,.55);mist.push(c)}
+ const pt=particles(g,300,140,0xffffff,.7);
+ S.cam=(p)=>{const a=1.35-p*.9;const r=105-p*20;return{pos:[Math.cos(a)*r*.6,52-p*12,Math.sin(a)*r],look:[0,22,-25]}};
+ S.upd.push(t=>{mist.forEach((c,i)=>{c.position.x=((i*37+t*6)%180)-90})});scenes.push(S)}
+
+// ===== 5. Chichen Itza =====
+{const S=mkScene({sky:[0x2f7fe0,0xfde2b0],fog:0xe9d7aa,fogD:[50,300],sun:[-.45,.55,.75],sunCol:0xffe0a8,sunI:3.2,amb:.8,hemi:[0xcfe8ff,0x55602a]});const g=S.g;
+ g.add(terrain(500,80,(x,z)=>.3*Math.sin(x*.2)*Math.cos(z*.2),M(0x6f9a3a)));
+ const plaza=new THREE.Mesh(new THREE.CircleGeometry(38,40),M(0xcab58a));plaza.rotation.x=-Math.PI/2;plaza.position.y=.35;plaza.receiveShadow=true;g.add(plaza);
+ const lime=M(0xd8c79c),lime2=M(0xbfae84),shade=M(0x9e8e68);
+ const P=new THREE.Group();g.add(P);
+ for(let i=0;i<9;i++){const s=26-i*2.3;box(P,s,2.4,s,i%2?lime2:lime,0,1.2+i*2.4,0);box(P,s+.3,.35,s+.3,shade,0,2.3+i*2.4,0)}
+ for(let k=0;k<4;k++){const a=k*Math.PI/2;const st=new THREE.Group();P.add(st);st.rotation.y=a;
+   for(let j=0;j<24;j++){const y=.45+j*.9,zz=13.4-j*.48;box(st,5,.45,1,lime,0,y,zz)}
+   box(st,.9,22,.9,shade,3,10,8).rotation.x=-1.08;box(st,.9,22,.9,shade,-3,10,8).rotation.x=-1.08;
+   if(k===0){for(const sd of[-1,1]){const hd=new THREE.Mesh(new THREE.BoxGeometry(1.6,1.6,2.2),M(0x8e7d55));hd.position.set(sd*3,1,14.6);st.add(hd)}}}
+ box(P,9,5.5,9,lime,0,24.4,0);box(P,9.8,.8,9.8,shade,0,27.5,0);box(P,2.2,3,.4,M(0x4a3a20),0,23.6,4.4);
+ trees(g,280,48,180,0x2f6b2a);trees(g,90,48,180,0x4f8a30);
+ const pt=particles(g,350,160,0xffe8a8,1);
+ S.cam=(p)=>{const a=1.1+p*1.25;const r=60-p*8;return{pos:[Math.cos(a)*r,10+p*20,Math.sin(a)*r],look:[0,11,0]}};
+ S.upd.push(t=>{pt.rotation.y=t*.02});scenes.push(S)}
+
+// ===== 6. Colosseum =====
+{const S=mkScene({sky:[0x3f78c8,0xffcf9a],fog:0xe8c9a0,fogD:[60,320],sun:[-.6,.35,.6],sunCol:0xffcf8f,sunI:3,amb:.85,hemi:[0xffe6c8,0x6a5a40]});const g=S.g;
+ g.add(terrain(500,60,()=>0,M(0x9b9068)));
+ const trav=M(0xd6bf93),trav2=M(0xbfa77d),dark=M(0x5e4c36);
+ const A=26,B=21,N=80;const levels=[{h:7,r:1},{h:7,r:1},{h:7,r:1},{h:6,r:1,solid:true}];
+ for(let i=0;i<N;i++){const t0=i/N*Math.PI*2;const x=Math.cos(t0)*A,z=Math.sin(t0)*B;const ang=Math.atan2(Math.cos(t0)*B,-Math.sin(t0)*A);
+   const broken=(t0>3.6&&t0<5.4);let y=0;
+   levels.forEach((L,li)=>{if(broken&&li>=2)return;if(broken&&li===1&&(i%3===0))return;
+     const segLen=2*Math.PI*Math.sqrt((A*A+B*B)/2)/N;
+     if(L.solid){box(g,segLen+.05,L.h,1.6,trav2,x,y+L.h/2,z,-ang)}
+     else{box(g,segLen*.42,L.h,1.8,trav,x,y+L.h/2,z,-ang).translateX(-segLen*.29);box(g,segLen+.05,1.1,1.9,trav2,x,y+L.h-.55,z,-ang)}
+     y+=L.h})
+   if(broken){const ri=.8;box(g,2.1,7,1.5,trav2,Math.cos(t0)*(A-3.2),3.5+7,Math.sin(t0)*(B-3.2),-ang)}}
+ // inner tiers
+ for(let k=0;k<6;k++){const s=1-k*.09;const ring=new THREE.Mesh(new THREE.CylinderGeometry(A*s-1.5,A*(s-.09)-1.5,3.2,64,1,true),M(k%2?0xc3ac80:0xb09872,{}));ring.material.side=THREE.DoubleSide;ring.scale.z=B/A;ring.position.y=18-k*3.1;ring.receiveShadow=ring.castShadow=true;g.add(ring)}
+ const arena=new THREE.Mesh(new THREE.CircleGeometry(11,40),M(0x7a5d40));arena.scale.y=B/A*.9;arena.rotation.x=-Math.PI/2;arena.position.y=.2;g.add(arena);
+ for(let i=0;i<10;i++)box(g,.5,2,14,dark,-9+i*2,1,0);
+ trees(g,80,60,160,0x3b5d2a);for(let i=0;i<30;i++){const a=rnd()*6.28,r=70+rnd()*120;box(g,6+rnd()*6,4+rnd()*10,6+rnd()*6,M(0xc89a6a),Math.cos(a)*r,3,Math.sin(a)*r,rnd())}
+ const pt=particles(g,400,160,0xffd6a0,1);
+ S.cam=(p)=>{const a=-.2+p*1.5;const r=100-p*22;return{pos:[Math.cos(a)*r,22+p*34,Math.sin(a)*r],look:[0,6,0]}};
+ S.upd.push(t=>{pt.rotation.y=-t*.025});scenes.push(S)}
+
+// ===== 7. Taj Mahal =====
+{const S=mkScene({sky:[0x3a3f8a,0xffa98a],fog:0xe9a99a,fogD:[60,320],sun:[.2,.18,-.9],sunCol:0xffb48a,sunI:2.4,amb:1.7,hemi:[0xffd2e0,0x5a4a6a]});const g=S.g;
+ g.add(terrain(500,40,()=>0,M(0x587a3a)));
+ const marble=M(0xf6f0ea,{r:.45}),m2=M(0xe7ddd3,{r:.5}),red=M(0xa8503a);
+ box(g,70,2,140,red,0,1,30);box(g,44,3,44,marble,0,3.5,0);
+ const pool=new THREE.Mesh(new THREE.PlaneGeometry(5,70),new THREE.MeshStandardMaterial({color:0x6c8fd0,roughness:.05,metalness:.9}));pool.rotation.x=-Math.PI/2;pool.position.set(0,2.05,62);g.add(pool);
+ for(const sd of[-1,1])for(let i=0;i<12;i++){cyl(g,0,1.1,6,7,M(0x2a5a2a),sd*6.5,5,30+i*6)}
+ const main=cyl(g,14,14,17,8,marble,0,13.5,0);main.rotation.y=Math.PI/8;
+ for(let k=0;k<4;k++){const a=k*Math.PI/2;box(g,7,12,.4,M(0xd6ccc0),Math.sin(a)*13.05,12,Math.cos(a)*13.05,a);box(g,4,9,.5,M(0x8a7a6a),Math.sin(a)*13.1,10.5,Math.cos(a)*13.1,a)}
+ cyl(g,7,7,4,24,m2,0,24,0);
+ const prof=[];for(let i=0;i<=24;i++){const t=i/24;const r=7.4*Math.sin(Math.PI*Math.min(1,t*1.35))*(1-t*.25)+ (t<.08?6.8*(1-t/.08)*0:0);prof.push(new THREE.Vector2(Math.max(.15,r*(1-Math.pow(t,3))),t*16))}
+ const dome=new THREE.Mesh(new THREE.LatheGeometry(prof,32),marble);dome.position.y=26;dome.castShadow=true;g.add(dome);
+ cyl(g,.15,.5,5,8,M(0xe2b25a,{m:.8,r:.3}),0,43.5,0);
+ for(let k=0;k<4;k++){const a=Math.PI/4+k*Math.PI/2;const x=Math.cos(a)*9,z=Math.sin(a)*9;cyl(g,2.4,2.4,3,8,m2,x,23.5,z);
+   const d=new THREE.Mesh(new THREE.LatheGeometry(prof,16),marble);d.scale.setScalar(.33);d.position.set(x,25,z);g.add(d)}
+ for(let k=0;k<4;k++){const a=Math.PI/4+k*Math.PI/2;const x=Math.cos(a)*29,z=Math.sin(a)*29;cyl(g,1.4,1.8,30,12,marble,x,20,z);
+   for(let r=0;r<3;r++)cyl(g,2.4,2.2,.6,12,m2,x,13+r*9,z);cyl(g,2,2,2.4,8,m2,x,36.3,z);const d=new THREE.Mesh(new THREE.LatheGeometry(prof,16),marble);d.scale.setScalar(.3);d.position.set(x,37.5,z);g.add(d)}
+ for(const sd of[-1,1]){box(g,22,10,14,red,sd*48,7,0);cyl(g,0,5,6,16,red,sd*48,15,0)}
+ trees(g,120,70,200,0x2f5a2a);
+ const stars=particles(g,500,500,0xffffff,1.6);stars.position.y=60;
+ const pt=particles(g,250,100,0xffd0e0,.9);
+ S.cam=(p)=>{const z=120-p*55;return{pos:[Math.sin(p*1.4)*14,6+p*14,z],look:[0,20+p*2,0]}};
+ S.upd.push(t=>{pt.rotation.y=t*.04;stars.material.opacity=.4+.3*Math.sin(t*2)});scenes.push(S)}
+
+// intro / outro background scene: rotating globe of glowing wonders
+const IS={s:new THREE.Scene(),upd:[]};
+{const s=IS.s;s.background=new THREE.Color(0x05060d);
+ const globe=new THREE.Mesh(new THREE.IcosahedronGeometry(10,3),new THREE.MeshStandardMaterial({color:0x1a3a6a,flatShading:true,roughness:.6,metalness:.2,emissive:0x0a1a3a}));s.add(globe);
+ const wire=new THREE.Mesh(new THREE.IcosahedronGeometry(10.15,3),new THREE.MeshBasicMaterial({color:0xffc870,wireframe:true,transparent:true,opacity:.25}));s.add(wire);
+ const pins=new THREE.Group();s.add(pins);
+ const ll=[[40.4,116.6],[30.3,35.4],[-22.95,-43.2],[-13.2,-72.5],[20.7,-88.6],[41.9,12.5],[27.2,78]];
+ ll.forEach(([la,lo])=>{const phi=(90-la)*Math.PI/180,th=(lo+180)*Math.PI/180;const v=new THREE.Vector3(-Math.sin(phi)*Math.cos(th),Math.cos(phi),Math.sin(phi)*Math.sin(th));
+   const m=new THREE.Mesh(new THREE.SphereGeometry(.45,12,8),new THREE.MeshBasicMaterial({color:0xffd27a}));m.position.copy(v.clone().multiplyScalar(10.3));pins.add(m);
+   const b=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,4,6),new THREE.MeshBasicMaterial({color:0xffd27a,transparent:true,opacity:.7}));b.position.copy(v.clone().multiplyScalar(12));b.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v);pins.add(b)});
+ s.add(new THREE.AmbientLight(0x6080ff,.6));const L=new THREE.DirectionalLight(0xffe0b0,3);L.position.set(20,10,15);s.add(L);
+ const st=particles(s,1500,300,0xffffff,1.2);st.position.y=-75;
+ const ring=particles(s,0,1,0xffc870,1);
+ IS.globe=[globe,wire,pins];IS.st=st;}
+
+// ---------- UI ----------
+const $=id=>document.getElementById(id);
+const dots=$('dots');for(let i=0;i<7;i++)dots.appendChild(document.createElement('div'));
+$('grid').innerHTML=W.map((w,i)=>`<div><i>${i+1}</i>${w.name}</div>`).join('');
+let curUI=-1;
+function setUI(i){if(curUI===i)return;curUI=i;const w=W[i];$('num').textContent=`0${i+1} / 07`;
+ $('title').innerHTML=w.name.split('').map(c=>`<span>${c===' '?'&nbsp;':c}</span>`).join('');
+ $('loc').innerHTML=`📍 ${w.loc} &nbsp;·&nbsp; <i>${w.era}</i>`;
+ $('card').innerHTML=w.facts.map((f,k)=>`<div class="fact"><div class="k">${k+1}</div><div class="t">${f}</div></div>`).join('');
+ [...dots.children].forEach((d,k)=>d.className=k===i?'on':'')}
+const st=(el,o,ty=0,sc=1,blur=0)=>{el.style.opacity=o;el.style.transform=`translateY(${ty}px) scale(${sc})`;el.style.filter=blur?`blur(${blur}px)`:''};
+
+window.renderAt=function(t){
+ const flash=$('flash'),black=$('black');flash.style.opacity=0;black.style.opacity=0;
+ const sceneUI=$('scene'),intro=$('intro'),outro=$('outro');
+ if(t<T_INTRO||t>=TOTAL-T_OUTRO){
+   sceneUI.style.opacity=0;const isIntro=t<T_INTRO;intro.style.opacity=isIntro?1:0;outro.style.opacity=isIntro?0:1;
+   const lt=isIntro?t:t-(TOTAL-T_OUTRO);
+   const [globe,wire,pins]=IS.globe;const r=lt*.35+(isIntro?0:2);[globe,wire,pins].forEach(o=>o.rotation.y=r);
+   IS.st.rotation.y=lt*.03;
+   if(isIntro){camera.position.set(0,2,62-lt*6);camera.lookAt(0,3,0);
+     st($('i0'),eout(lt/.6),40*(1-eout(lt/.6)));st($('i1'),eout((lt-.3)/.7),0,.4+.6*eback((lt-.3)/.8),20*(1-eout((lt-.3)/.6)));
+     st($('i2'),eout((lt-.8)/.6),60*(1-eout((lt-.8)/.6)));st($('i3'),eout((lt-1.4)/.6),30*(1-eout((lt-1.4)/.6)));
+     flash.style.opacity=Math.max(0,.9-lt*3)*0+clamp((lt-(T_INTRO-.25))/.25)*.9;
+   } else {camera.position.set(0,0,60-lt*3);camera.lookAt(0,-20,0);
+     st($('o1'),eout(lt/.6),40*(1-eout(lt/.6)));st($('grid'),eout((lt-.5)/.6),40*(1-eout((lt-.5)/.6)));st($('o2'),eout((lt-1.2)/.5),0,.8+.2*eback((lt-1.2)/.5));
+     flash.style.opacity=clamp(1-lt/.35)*.9;black.style.opacity=clamp((lt-(T_OUTRO-.6))/.6)}
+   camera.fov=50;camera.updateProjectionMatrix();renderer.render(IS.s,camera);return}
+ intro.style.opacity=0;outro.style.opacity=0;sceneUI.style.opacity=1;
+ const i=Math.min(6,Math.floor((t-T_INTRO)/T_SCENE)),lt=t-T_INTRO-i*T_SCENE,p=lt/T_SCENE;setUI(i);
+ const S=scenes[i];S.upd.forEach(f=>f(t));
+ const c=S.cam(ease(p)*.85+p*.15);camera.position.set(...c.pos);camera.lookAt(...c.look);
+ // camera micro-shake on entry + fov zoom
+ camera.fov=58-10*eout(lt/1.2);camera.updateProjectionMatrix();
+ renderer.render(S.s,camera);
+ // transitions
+ flash.style.opacity=clamp(1-lt/.35)*.85;
+ black.style.opacity=0;if(lt>T_SCENE-.25&&i<6)flash.style.opacity=clamp((lt-(T_SCENE-.25))/.25)*.85;
+ // text
+ const letters=[...$('title').children];letters.forEach((s,k)=>{const q=eout((lt-.25-k*.035)/.5);s.style.opacity=q;s.style.transform=`translateY(${(1-q)*80}px) rotateX(${(1-q)*80}deg)`});
+ st($('badge'),eout((lt-.1)/.4),-20*(1-eout((lt-.1)/.4)));
+ st($('loc'),eout((lt-.7)/.5),20*(1-eout((lt-.7)/.5)));
+ const cardIn=eout((lt-1.1)/.6);st($('card'),cardIn,120*(1-cardIn));
+ [...$('card').children].forEach((f,k)=>{const q=eout((lt-1.5-k*1.15)/.5);f.style.opacity=q;f.style.transform=`translateX(${(1-q)*-60}px)`});
+ const out=clamp((lt-(T_SCENE-.45))/.35);if(i<6&&out>0){sceneUI.style.opacity=1-out}
+};
+window.ready=true;
+</script></body></html>
