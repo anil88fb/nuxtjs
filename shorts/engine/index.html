@@ -93,8 +93,8 @@ const MOTIFS = {
       mesh(new THREE.SphereGeometry(.55, 14, 10), glow(P.a, 1.8), g, ...p1); mesh(new THREE.SphereGeometry(.55, 14, 10), glow(P.b, 1.8), g, ...p2);
       const r = mesh(new THREE.CylinderGeometry(.14, .14, 8, 8), std(P.c, { e: P.c, ei: .6 }), g, 0, y, 0); r.rotation.z = Math.PI / 2; r.rotation.y = -a; bars.push(r) }
     return t => { g.rotation.y = t * .5 } },
-  planet(g, P) { const pl = mesh(new THREE.IcosahedronGeometry(6, 4), std(P.a, { flat: true, r: .7, m: .1 }), g); const ring = mesh(new THREE.RingGeometry(8, 12.5, 96), std(P.b, { o: .7, side: THREE.DoubleSide, e: P.b, ei: .4 }), g); ring.rotation.x = 1.25;
-    const moons = []; for (let i = 0; i < 3; i++) moons.push(mesh(new THREE.SphereGeometry(.6 + i * .2, 16, 12), std(0xdddddd, { r: .8 }), g));
+  planet(g, P) { const pl = mesh(new THREE.IcosahedronGeometry(6, 4), std(P.a, { flat: true, r: .7, m: .1 }), g); if (!P.noRings) { const ring = mesh(new THREE.RingGeometry(8, 12.5, 96), std(P.b, { o: .7, side: THREE.DoubleSide, e: P.b, ei: .4 }), g); ring.rotation.x = 1.25 }
+    const moons = []; for (let i = 0; i < (P.moons ?? 3); i++) moons.push(mesh(new THREE.SphereGeometry(.6 + i * .2, 16, 12), std(0xdddddd, { r: .8 }), g));
     return t => { pl.rotation.y = t * .3; moons.forEach((m, i) => { const a = t * (.5 + i * .25) + i * 2; m.position.set(Math.cos(a) * (15 + i * 2), Math.sin(a * .7) * 2, Math.sin(a) * (15 + i * 2)) }) } },
   solar(g, P) { mesh(new THREE.SphereGeometry(3.6, 32, 24), glow(0xffb347, 3), g); const pl = []; const cs = [0xb0b0b0, 0xe8c070, 0x3d8be8, 0xd0603a, 0xe0b080, 0xe8d8a0];
     cs.forEach((c, i) => { const r = 6 + i * 2.6; line(g, Array.from({ length: 97 }, (_, k) => new THREE.Vector3(Math.cos(k / 96 * 6.283) * r, 0, Math.sin(k / 96 * 6.283) * r)), 0xffffff, .2); pl.push({ m: mesh(new THREE.SphereGeometry(.45 + i * .14, 16, 12), std(c, { r: .6 }), g), r, sp: 1.4 / Math.sqrt(i + 1) }) });
@@ -202,7 +202,7 @@ const PALS = [ // fallback palettes
   { a: 0xff6b6b, b: 0xffd166, c: 0xffe3e3, skyTop: 0x1a0505, skyBot: 0x4a1515 },
 ];
 const hx = v => typeof v === 'string' ? parseInt(v.replace('#', ''), 16) : v;
-const scenes = items.map((it, i) => { const p = Object.assign({}, PALS[i % PALS.length], Object.fromEntries(Object.entries(it.palette || {}).map(([k, v]) => [k, hx(v)]))); return buildScene(it.visual, p) });
+const scenes = items.map((it, i) => { const p = Object.assign({}, PALS[i % PALS.length], Object.fromEntries(Object.entries(it.palette || {}).map(([k, v]) => [k, hx(v)]))); return buildScene(it.visual, Object.assign(p, it.options || {})) });
 const introS = buildScene(C.introVisual || items[0].visual, Object.assign({}, PALS[0], Object.fromEntries(Object.entries(C.introPalette || items[0].palette || {}).map(([k, v]) => [k, hx(v)]))));
 const outroS = buildScene(C.outroVisual || 'globe', Object.assign({}, PALS[3], Object.fromEntries(Object.entries(C.outroPalette || {}).map(([k, v]) => [k, hx(v)]))));
 

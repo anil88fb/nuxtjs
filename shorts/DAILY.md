@@ -59,6 +59,8 @@ Rules:
 - **Accuracy first.** Use only well-established facts that you could cite (NASA, NIH, Britannica, central banks, museums).
   Round honestly ("about", "~"). Skip anything disputed or famous-but-false (for example, "we only use 10% of our brain").
 - Give every item a different `visual` and a distinct palette. `skyTop`/`skyBot` are dark tones; `a`/`b`/`c` are bright accents.
+- Optional per-item `options` adjust a motif. The `planet` motif has rings and 3 moons by default, so for a real planet set
+  `"options": {"noRings": true, "moons": 0}` (Venus, Mars, Earth…) to match reality. **The visuals must never contradict the facts.**
 - Available `visual` motifs: `atom dna planet solar brain coins chart globe book bulb art gears crystal clock mountain ocean rocket heart pyramid city dice`.
 
 ## 4. Render
