@@ -46,3 +46,16 @@ npm run preview
 ```
 
 Checkout the [deployment documentation](https://nuxt.com/docs/getting-started/deployment#presets) for more information.
+
+## Crypto market data API (for the bot)
+
+Public Binance market data, no API key needed. Server routes under `/api/market`:
+
+| Route | Example | Returns |
+| --- | --- | --- |
+| `klines` | `/api/market/klines?symbol=BTCUSDT&interval=1h&limit=500` | OHLCV candles (`startTime`/`endTime` in ms optional, max 1000) |
+| `ticker` | `/api/market/ticker?symbols=BTCUSDT,ETHUSDT` | 24h price, change %, volume |
+| `depth` | `/api/market/depth?symbol=BTCUSDT&limit=100` | Order book, best bid/ask, spread |
+| `snapshot` | `/api/market/snapshot?symbols=BTCUSDT,ETHUSDT&interval=15m&limit=200` | Ticker + candles for each symbol in one call (max 20) |
+
+Config (env vars): `NUXT_BINANCE_BASE_URLS` (comma-separated, tried in order; default `https://data-api.binance.vision,https://api.binance.com`) and `NUXT_BINANCE_DEFAULT_SYMBOLS`.
