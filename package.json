@@ -6,7 +6,10 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "bot": "node bot/index.mjs",
+    "bot:once": "node bot/index.mjs --once",
+    "test:bot": "node --test bot/strategy.test.mjs"
   },
   "devDependencies": {
     "@nuxt/devtools": "^1.0.3",

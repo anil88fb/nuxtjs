@@ -93,3 +93,7 @@ sw.*
 
 # Vercel
 .vercel
+
+# bot paper-trading state
+bot/state.json
+bot/state.json.tmp
