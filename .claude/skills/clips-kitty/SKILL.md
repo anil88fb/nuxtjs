@@ -65,8 +65,13 @@ scripts/setup-clips-kitty.sh --serve
 ```
 
 It clones Clips Kitty to `../clips-kitty` (if missing), installs its Python 3.12
-dependencies (a few minutes on first run), starts the engine in the background and waits
-for `/health`. It is safe to rerun. Without `--serve` it only installs.
+dependencies, installs Ollama to `../ollama`, starts it and pulls `gemma:7b` (~5 GB;
+`CK_MODEL=` picks another), then starts the engine in the background and waits for
+`/health`. First run takes several minutes; reruns take seconds. Without `--serve` it
+does everything except start the engine.
+
+Model downloads need `registry.ollama.ai` and `ollama.com` on the network allowlist; the
+`nuxtjs` cloud environment has them. If the pull is refused, say which hosts are missing.
 
 Optionally register the MCP server (loads on the next session start):
 
@@ -74,9 +79,9 @@ Optionally register the MCP server (loads on the next session start):
 claude mcp add clips-kitty -- ../clips-kitty/.venv/bin/python ../clips-kitty/main.py mcp
 ```
 
-Without a GPU everything runs on CPU and is slow. Clip selection needs an LLM: a local
-Ollama (`ollama pull gemma:7b`) or an OpenRouter key set in `config/settings.yaml`.
-Without one, jobs will fail at the analysis step; say so rather than guessing.
+Without a GPU everything runs on CPU and is slow: expect a long video to take hours, so
+suggest a short one first. `python main.py models` shows the active model; Clips Kitty
+suggests `gemma3:4b` for CPU-only machines (`python main.py models use gemma3:4b`).
 
 ## Using the HTTP API directly (when MCP tools are not loaded)
 
