@@ -3,9 +3,9 @@ name: ya-olsaydi
 description: "Ya Olsaydı?" YouTube kanalı için Tuhaf Tahsin'li yeni bölüm üretir: fikir, Türkçe senaryo, ElevenLabs seslendirmesi, cizgi-short ile animasyon, bitmiş 9:16 MP4 ve yükleme paketi (kapak, başlık, açıklama). "Yeni bölüm", "Ya Olsaydı videosu", "Tahsin'li video", "kanal için video yap" isteklerinde kullan.
 ---
 
-# Ya Olsaydı? · bölüm üretimi
+# Tuhaf Tahsin · bölüm üretimi
 
-Kanal: **Ya Olsaydı?** Türkçe, dikey (9:16) animasyonlu "ya … olsaydı?" hikâyeleri.
+Kanal: **Tuhaf Tahsin** (YouTube `UC5BffrS1Ug88Pzo4_MTBsxg`), seri adı **Ya Olsaydı?** Türkçe, dikey (9:16) animasyonlu "ya … olsaydı?" hikâyeleri.
 Ana karakter: **Tuhaf Tahsin**. Her bölümde aynı görünür; yan karakterler, mekân ve renkler
 hikâyeye göre değişir. Üretim tamamen bu oturumda yapılır: senaryo burada yazılır, ses
 ElevenLabs'te üretilir, video `cizgi-short` kitiyle çizilir.
@@ -73,6 +73,12 @@ sesi indirip `work/voice.mp3` olarak koy; okunan metni `script.txt` yap.
 - Üretim ücretsiz plandan karakter harcar (ayda 10.000). Kalan hakkı `account_get_usage` ile
   kontrol et. Senaryo kalan haktan uzunsa kullanıcıya söyle.
 - Başarısız üretimi aynı çağrıyla tekrarlama (ikinci kez ücret alır). Önce durumu kontrol et.
+- Model `eleven_v4`, tek üretim (`generations_count: 1`). Duygu etiketleri ([curious], [excited]...) serbest;
+  `script.txt` ise etiketsiz düz metin olmalı. Ses dosyası `elevenlabsusercontent.com`'dan indirilir.
+- **Yedek: Speko.** ElevenLabs kredisi yetmezse (`account_get_usage`: kalan < senaryo karakteri + 100) ya da
+  üretim kredi hatasıyla düşerse `audio_synthesize` kullan: `{"text": <etiketsiz metin>, "intent": {"language": "tr"},
+  "voice": "91e91d74-8eb4-43cd-97d3-7466c21db00d", "constraints": {"allowedProviders": {"tts": ["cartesia"]}}}`
+  (Cartesia "Aykut - Friendly Companion"). Base64 sesi ya da indirme linkini `work/voice.mp3` (veya .wav) olarak kaydet.
 - Kullanıcı kendi sesini yüklerse ElevenLabs'i atla.
 
 ## Aşama 4: Video (cizgi-short)
@@ -125,3 +131,20 @@ Son olarak `bolumler.md` dosyasına bölümün satırını ekle, commit et ve pu
 - Gerçek kişi, marka maskotu ya da logo kullanma.
 - MP4'ü ve kapağı kullanıcıya dosya olarak gönder. Ağır çıktıları (frames/, work/) repoya
   commit etme. Bunlar repo dışındaki `~/ya-olsaydi/` klasöründe kalır.
+
+## Yükleme ve otomasyon (Metricool)
+
+- **Metricool markası:** blogId `8286087`, saat dilimi `Europe/Istanbul`, YouTube `UC5BffrS1Ug88Pzo4_MTBsxg`
+  ("Tuhaf Tahsin."). Başka bir kanala (ör. "Why?") ASLA yükleme yapma: önce `getBrandSettings` ile kanal
+  kimliğini doğrula, eşleşmezse dur ve bildir.
+- **Yayın saatleri:** her gün **10:00** ve **16:00** (Metricool en iyi saat verisi). Tam otomatik yayın
+  (kullanıcı kararı); onay beklemeden `autoPublish: true`.
+- **Video linki:** Metricool herkese açık bir URL ister. MP4'ü vidIQ'ya yükle:
+  `vidiq_video_upload` → `localFile {path, sizeBytes, contentType: "video/mp4"}`, dönen komutu çalıştır, sonra
+  `uploadId` ile tekrar çağırıp `videoUrl` al. Bu URL'yi Metricool `media` listesine ver.
+- **Gönderi:** `createScheduledPost`, `providers: [{"network":"youtube"}]`, `text` = açıklama,
+  `youtubeData: {title, type: "short", privacy: "public", tags: [...], category: "FILM_ANIMATION",
+  madeForKids: false, isAiGeneratedContent: false}`. Kapak için `videoCoverMilliseconds` verme (Shorts'ta
+  kanal doğrulanmadan reddedilebilir).
+- **Aynı slota iki video koyma:** göndermeden önce `getScheduledPosts` ile o günün slotunu kontrol et.
+- Konu sırası `konular.md`'de; kullanılan konuyu işaretle, `bolumler.md`'ye satır ekle, commit + push.
