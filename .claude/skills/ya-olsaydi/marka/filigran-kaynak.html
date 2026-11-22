@@ -1,0 +1,23 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0"><script type="module">
+import { drawFx } from "./cast.js";
+const mk = () => { const c = document.createElement("canvas"); c.width = c.height = 800; return c; };
+function icon(g, bg, hairStroke, cream, q) {
+  if (bg) { g.beginPath(); g.arc(400, 400, 400, 0, 7); g.fillStyle = bg; g.fill(); }
+  g.lineJoin = "round";
+  const hair = [[150, 420], [150, 250], [235, 330], [300, 190], [365, 320], [430, 180], [490, 315], [560, 195], [600, 325], [650, 250], [650, 420]];
+  g.beginPath(); hair.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.fillStyle = "#e8742c"; g.fill(); g.strokeStyle = hairStroke; g.lineWidth = 22; g.stroke();
+  for (const x of [275, 525]) { g.beginPath(); g.arc(x, 540, 105, 0, 7); g.lineWidth = 30; g.strokeStyle = cream; g.stroke(); g.beginPath(); g.arc(x + 10, 548, 34, 0, 7); g.fillStyle = cream; g.fill(); }
+  g.beginPath(); g.moveTo(380, 530); g.quadraticCurveTo(400, 505, 420, 530); g.lineWidth = 26; g.strokeStyle = cream; g.stroke();
+  if (q) { g.save(); g.translate(640, 150); g.rotate(0.3); g.scale(170 / 512, 170 / 512); g.translate(-256, -256); drawFx(g, "question", 0, { col: "#2fa39a" }); g.restore(); }
+}
+// 1: yuvarlak rozet (logo ile aynı), dışı şeffaf
+{ const c = mk(), g = c.getContext("2d"); icon(g, "#241d45", "#fbf5ea", "#fbf5ea", true); window.wm1 = c.toDataURL(); }
+// 2: zeminsiz ikon (koyu kontur, her videoda okunur)
+{ const c = mk(), g = c.getContext("2d"); g.translate(400, 430); g.scale(1.12, 1.12); g.translate(-400, -400);
+  icon(g, null, "#1d1622", "#fbf5ea", false);
+  // koyu dış hat: gözlüklere de
+  g.globalCompositeOperation = "destination-over"; g.shadowColor = "#1d1622"; g.shadowBlur = 0;
+  for (const [dx, dy] of [[-8,0],[8,0],[0,-8],[0,8],[-6,-6],[6,6],[-6,6],[6,-6]]) { g.shadowOffsetX = dx; g.shadowOffsetY = dy; icon(g, null, "#1d1622", "#1d1622", false); }
+  window.wm2 = c.toDataURL(); }
+window.done = true;
+</script>
