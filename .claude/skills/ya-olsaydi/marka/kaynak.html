@@ -1,0 +1,54 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0;background:#222">
+<script type="module">
+import { drawChar, drawFx, INK } from "./cast.js" /* .claude/skills/cizgi-short/kit/engine/cast.js dosyasını yanına kopyala */;
+const f = new FontFace("Brand", "url(Nunito.ttf)", { weight: "200 1000" }); await f.load(); document.fonts.add(f);
+const TAHSIN = { skin: "#ffffff", hair: "spiky", hairCol: "#e8742c", glasses: true, jacket: "#f4f4f0", shirt: "#2fa39a", pants: "#2b3a4a", shoes: "#3a2a20", seed: 11 };
+const C = { navy: "#241d45", navy2: "#2f2660", orange: "#e8742c", teal: "#2fa39a", cream: "#fbf5ea", yellow: "#ffcf4a" };
+const mk = (w, h) => { const c = document.createElement("canvas"); c.width = w; c.height = h; return c; };
+function rays(g, cx, cy, R, n, a, b) { g.save(); for (let i = 0; i < n; i++) { const t0 = (i / n) * Math.PI * 2, t1 = t0 + Math.PI / n; g.fillStyle = i % 2 ? a : b; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + R * Math.cos(t0), cy + R * Math.sin(t0)); g.lineTo(cx + R * Math.cos(t1), cy + R * Math.sin(t1)); g.fill(); } g.restore(); }
+function fx(g, kind, x, y, s, rot = 0, opt) { g.save(); g.translate(x, y); g.rotate(rot); g.scale(s / 512, s / 512); g.translate(-256, -256); drawFx(g, kind, 0, opt); g.restore(); }
+function ch(g, x, y, s, st) { g.save(); g.translate(x, y); g.scale(s, s); g.translate(-300, -975); drawChar(g, TAHSIN, st); g.restore(); }
+function title(g, text, x, y, size, fill, stroke, sw, align = "center") {
+  g.font = `900 ${size}px Brand`; g.textAlign = align; g.textBaseline = "middle"; g.lineJoin = "round";
+  g.lineWidth = sw * 2; g.strokeStyle = stroke; g.strokeText(text, x, y + size * 0.06);
+  g.lineWidth = sw; g.strokeText(text, x, y); g.fillStyle = fill; g.fillText(text, x, y);
+}
+function pill(g, x, y, w, h, fill) { g.beginPath(); g.roundRect(x - w / 2, y - h / 2, w, h, h / 2); g.fillStyle = fill; g.fill(); g.lineWidth = 10; g.strokeStyle = INK; g.stroke(); }
+function doodles(g, W, H, seed, avoid) {
+  let s = seed; const r = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+  const kinds = ["question", "idea", "sparkle", "question", "exclaim"];
+  for (let i = 0; i < 60; i++) { const x = r() * W, y = r() * H; if (avoid && avoid(x, y)) continue;
+    g.globalAlpha = 0.16; fx(g, kinds[i % kinds.length], x, y, 70 + r() * 90, (r() - 0.5) * 0.8, { col: C.cream }); }
+  g.globalAlpha = 1;
+}
+// ---------- LOGO 800x800 ----------
+{ const c = mk(800, 800), g = c.getContext("2d");
+  g.fillStyle = C.teal; g.fillRect(0, 0, 800, 800); rays(g, 400, 330, 900, 28, "#38b3a9", C.teal);
+  const rg = g.createRadialGradient(400, 360, 60, 400, 400, 560); rg.addColorStop(0, "rgba(255,207,74,.35)"); rg.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = rg; g.fillRect(0, 0, 800, 800);
+  ch(g, 400, 1530, 1.62, { face: "grin", arms: "hang", blink: 0, look: 0 });
+  fx(g, "idea", 640, 150, 210, 0.25);
+  window.logo = c.toDataURL("image/png"); }
+// ---------- BANNER 2560x1440 (güvenli alan: 1546x423 ortada) ----------
+{ const W = 2560, H = 1440, c = mk(W, H), g = c.getContext("2d");
+  const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, C.navy2); bg.addColorStop(1, C.navy); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  rays(g, 820, 720, 2600, 40, "rgba(255,255,255,0.035)", "rgba(0,0,0,0)");
+  doodles(g, W, H, 7, (x, y) => x > 470 && x < 2100 && y > 470 && y < 970);
+  // zemin şeridi
+  g.fillStyle = C.orange; g.fillRect(0, 1010, W, 22); g.fillStyle = "rgba(0,0,0,.18)"; g.fillRect(0, 1032, W, 408);
+  // Tahsin (güvenli alanın solunda)
+  ch(g, 640, 1015, 0.6, { face: "grin", arms: "point", blink: 0, look: 0.6, prop: { kind: "magnifier", hand: "l" } });
+  fx(g, "idea", 790, 585, 110, 0.25);
+  // başlık
+  title(g, "Tuhaf Tahsin", 1420, 630, 180, C.cream, INK, 22);
+  pill(g, 1420, 790, 780, 110, C.orange);
+  title(g, "Ya Olsaydı?", 1420, 788, 76, C.cream, INK, 12);
+  g.font = "800 44px Brand"; g.fillStyle = "rgba(251,245,234,.85)"; g.textAlign = "center"; g.fillText("Her hafta yeni bir tuhaf icat", 1420, 892);
+  fx(g, "question", 2230, 640, 170, 0.25, { col: C.yellow }); fx(g, "sparkle", 2150, 420, 160, 0);
+  window.banner = c.toDataURL("image/png");
+  // güvenli alan önizlemesi
+  const p = mk(W, H), pg = p.getContext("2d"); pg.drawImage(c, 0, 0);
+  pg.setLineDash([24, 18]); pg.lineWidth = 6; pg.strokeStyle = "#ff4d6d"; pg.strokeRect((W - 1546) / 2, (H - 423) / 2, 1546, 423);
+  pg.strokeStyle = "#7cf"; pg.strokeRect((W - 2560) / 2, (H - 423) / 2, 2560, 423);
+  window.preview = p.toDataURL("image/png"); }
+window.done = true;
+</script>
