@@ -1,0 +1,54 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0">
+<script type="module">
+import { drawChar, drawFx, INK, Pen } from "./cast.js";
+const f = new FontFace("Brand", "url(Nunito.ttf)", { weight: "200 1000" }); await f.load(); document.fonts.add(f);
+const T = { skin: "#ffffff", hair: "spiky", hairCol: "#e8742c", glasses: true, jacket: "#f4f4f0", shirt: "#2fa39a", pants: "#2b3a4a", shoes: "#3a2a20", seed: 11 };
+const mk = () => { const c = document.createElement("canvas"); c.width = c.height = 800; return c; };
+const ch = (g, x, y, s, st, rot = 0) => { g.save(); g.translate(x, y); g.rotate(rot); g.scale(s, s); g.translate(-300, -975); drawChar(g, T, st); g.restore(); };
+const fx = (g, k, x, y, s, r = 0, o) => { g.save(); g.translate(x, y); g.rotate(r); g.scale(s / 512, s / 512); g.translate(-256, -256); drawFx(g, k, 0, o); g.restore(); };
+const ring = (g, col, w) => { g.beginPath(); g.arc(400, 400, 400 - w / 2, 0, Math.PI * 2); g.lineWidth = w; g.strokeStyle = col; g.stroke(); };
+const out = {};
+// A: Büyüteçli dev göz (sarı)
+{ const c = mk(), g = c.getContext("2d"); g.fillStyle = "#ffcf4a"; g.fillRect(0, 0, 800, 800);
+  for (let i = 0; i < 9; i++) { g.beginPath(); g.arc(400, 400, 60 + i * 70, 0, 7); g.lineWidth = 18; g.strokeStyle = "rgba(255,255,255,.18)"; g.stroke(); }
+  ch(g, 360, 1450, 1.5, { face: "wow", arms: "hang", blink: 0, look: 0.4 }, -0.08);
+  // büyüteç
+  g.save(); g.translate(500, 470); g.lineCap = "round";
+  g.strokeStyle = INK; g.lineWidth = 64; g.beginPath(); g.moveTo(95, 95); g.lineTo(230, 230); g.stroke();
+  g.strokeStyle = "#8a5a32"; g.lineWidth = 40; g.beginPath(); g.moveTo(105, 105); g.lineTo(225, 225); g.stroke();
+  g.beginPath(); g.arc(0, 0, 135, 0, 7); g.fillStyle = "rgba(190,235,255,.45)"; g.fill(); g.lineWidth = 26; g.strokeStyle = INK; g.stroke();
+  g.beginPath(); g.arc(0, 0, 112, 0, 7); g.lineWidth = 16; g.strokeStyle = "#c9ced8"; g.stroke();
+  g.beginPath(); g.arc(-10, 5, 62, 0, 7); g.fillStyle = "#fff"; g.fill(); g.lineWidth = 10; g.strokeStyle = INK; g.stroke();
+  g.beginPath(); g.arc(8, 10, 30, 0, 7); g.fillStyle = INK; g.fill(); g.beginPath(); g.arc(18, -2, 10, 0, 7); g.fillStyle = "#fff"; g.fill();
+  g.restore(); out.A = c.toDataURL(); }
+// B: Minimal ikon: saç + gözlük (lacivert)
+{ const c = mk(), g = c.getContext("2d"); g.fillStyle = "#241d45"; g.fillRect(0, 0, 800, 800);
+  g.lineJoin = "round"; g.lineWidth = 26; g.strokeStyle = INK;
+  const hair = [[150, 420], [150, 250], [235, 330], [300, 190], [365, 320], [430, 180], [490, 315], [560, 195], [600, 325], [650, 250], [650, 420]];
+  g.beginPath(); hair.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.fillStyle = "#e8742c"; g.fill(); g.strokeStyle = "#fbf5ea"; g.lineWidth = 22; g.stroke();
+  for (const x of [275, 525]) { g.beginPath(); g.arc(x, 540, 105, 0, 7); g.lineWidth = 30; g.strokeStyle = "#fbf5ea"; g.stroke(); g.beginPath(); g.arc(x + 10, 548, 34, 0, 7); g.fillStyle = "#fbf5ea"; g.fill(); }
+  g.beginPath(); g.moveTo(380, 530); g.quadraticCurveTo(400, 505, 420, 530); g.lineWidth = 26; g.strokeStyle = "#fbf5ea"; g.stroke();
+  fx(g, "question", 640, 150, 170, 0.3, { col: "#2fa39a" });
+  out.B = c.toDataURL(); }
+// C: Şaşkın yüz + turuncu halka (mor)
+{ const c = mk(), g = c.getContext("2d"); const rg = g.createRadialGradient(400, 380, 50, 400, 400, 520); rg.addColorStop(0, "#6a4bd1"); rg.addColorStop(1, "#2c1f6b"); g.fillStyle = rg; g.fillRect(0, 0, 800, 800);
+  ch(g, 400, 1500, 1.5, { face: "shock", arms: "up", blink: 0, look: 0 }, 0.07);
+  fx(g, "exclaim", 655, 210, 200, 0.25); fx(g, "question", 150, 220, 180, -0.3, { col: "#ffcf4a" });
+  ring(g, "#e8742c", 46); out.C = c.toDataURL(); }
+// D: Fikir anı: göz kırpan Tahsin + büyük ampul (turkuaz-krem, 'TT' rozet)
+{ const c = mk(), g = c.getContext("2d"); g.fillStyle = "#fbf5ea"; g.fillRect(0, 0, 800, 800);
+  g.beginPath(); g.arc(400, 900, 520, 0, 7); g.fillStyle = "#2fa39a"; g.fill();
+  fx(g, "idea", 560, 175, 250, 0.2);
+  ch(g, 360, 1340, 1.2, { face: "happy", arms: "point", blink: 0, look: 0.5 });
+  ring(g, "#241d45", 30); out.D = c.toDataURL(); }
+// karşılaştırma sayfası (yuvarlak kırpılmış)
+{ const W = 4 * 420 + 60, c = document.createElement("canvas"); c.width = W; c.height = 560; const g = c.getContext("2d");
+  g.fillStyle = "#1d1b22"; g.fillRect(0, 0, W, 560); let i = 0;
+  for (const k of ["A", "B", "C", "D"]) { const im = new Image(); im.src = out[k]; await im.decode(); const x = 30 + i * 420 + 200, y = 230;
+    g.save(); g.beginPath(); g.arc(x, y, 190, 0, 7); g.clip(); g.drawImage(im, x - 190, y - 190, 380, 380); g.restore();
+    g.font = "900 54px Brand"; g.fillStyle = "#fff"; g.textAlign = "center"; g.fillText(k, x, 480);
+    // küçük boy (gerçek görünüm)
+    g.save(); g.beginPath(); g.arc(x + 150, 470, 30, 0, 7); g.clip(); g.drawImage(im, x + 120, 440, 60, 60); g.restore(); i++; }
+  out.sheet = c.toDataURL(); }
+Object.assign(window, out); window.done = true;
+</script>
