@@ -42,5 +42,6 @@ export function createClient({ apiKey, apiSecret, baseUrl, fetchImpl = globalThi
     myTrades: symbol => request('GET', '/api/v3/myTrades', { symbol, limit: 1000 }, true),
     order: params => request('POST', '/api/v3/order', { newOrderRespType: 'FULL', ...params }, true),
     testOrder: params => request('POST', '/api/v3/order/test', params, true),
+    apiRestrictions: () => request('GET', '/sapi/v1/account/apiRestrictions', {}, true),
   }
 }

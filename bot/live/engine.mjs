@@ -63,6 +63,7 @@ export function createBot({ cfg, client, log = console.log, persist = true }) {
       const symbol = asset + cfg.quote
       const rule = rules.get(symbol)
       if (!rule || !isTradableBase(asset) || state.positions[symbol]) continue
+      if (!cfg.live && state.drySold?.includes(symbol)) continue // already sold in the simulation
       const qty = b.free + b.locked
       const { price } = await client.price(symbol)
       if (!sellableQty(qty, Number(price), rule)) continue // dust
@@ -100,8 +101,10 @@ export function createBot({ cfg, client, log = console.log, persist = true }) {
     }
     const costBasis = pos.entryPrice * fillQty
     const pnl = proceeds - costBasis
+    dailyLoss() // roll the day over before adding
     if (pos.source === 'bot' || pos.source === 'imported') state.daily.realized += pnl
     pos.qty -= fillQty
+    if (!cfg.live && pos.source !== 'bot') (state.drySold ??= []).push(symbol)
     if (pos.qty <= 0 || !sellableQty(pos.qty, price, rule)) delete state.positions[symbol]
     else pos.costQuote = pos.costQuote * (pos.qty / (pos.qty + fillQty))
     record({ time: Date.now(), symbol, side: 'SELL', qty: fillQty, price: proceeds / fillQty, quote: proceeds, pnl, reason })

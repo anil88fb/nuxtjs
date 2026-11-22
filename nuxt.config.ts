@@ -1,9 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: { enabled: false },
+  app: { head: { title: 'Kripto Bot Paneli', htmlAttrs: { lang: 'tr' } } },
   routeRules: {
-    // prerender index route by default
-    '/': { prerender: true },
+    // control panel: rendered in the browser, talks to /api/bot/*
+    '/': { ssr: false },
   },
   runtimeConfig: {
     binance: {

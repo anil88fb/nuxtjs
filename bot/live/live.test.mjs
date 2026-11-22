@@ -180,3 +180,29 @@ test('daily loss limit blocks new buys', async () => {
   await bot.tick()
   assert.equal(ex.orders.length, 0)
 })
+
+test('realized profit counts on the first day', async () => {
+  const ex = fakeExchange({
+    balances: { USDT: 100, ETH: 0.5 }, prices: { ETHUSDT: 2000 },
+    history: { ETHUSDT: [{ time: 1, isBuyer: true, qty: '0.5', quoteQty: '900', commission: '0', commissionAsset: 'BNB' }] },
+  })
+  const bot = createBot({ cfg: baseCfg, client: ex.client, log: quiet, persist: false })
+  await bot.start(); await bot.tick()
+  assert.ok(bot.state.daily.realized > 90)
+})
+
+test('dry run does not re-import a coin it already sold in simulation', async () => {
+  const mk = () => fakeExchange({
+    balances: { USDT: 100, ETH: 0.5 }, prices: { ETHUSDT: 2000 },
+    history: { ETHUSDT: [{ time: 1, isBuyer: true, qty: '0.5', quoteQty: '900', commission: '0', commissionAsset: 'BNB' }] },
+  })
+  const cfg = { ...baseCfg, live: false }
+  const bot = createBot({ cfg, client: mk().client, log: quiet, persist: false })
+  await bot.start(); await bot.tick()
+  assert.deepEqual(bot.state.drySold, ['ETHUSDT'])
+  // simulate restart with the same state
+  const bot2 = createBot({ cfg, client: mk().client, log: quiet, persist: false })
+  Object.assign(bot2.state, JSON.parse(JSON.stringify(bot.state)))
+  await bot2.start()
+  assert.equal(bot2.state.positions.ETHUSDT, undefined)
+})

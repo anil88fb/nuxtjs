@@ -87,7 +87,18 @@ What it does every `BOT_POLL_SECONDS`:
 
 Safety limits: `BOT_MAX_OPEN_POSITIONS`, `BOT_MAX_TOTAL` (total invested by the bot), `BOT_RESERVE`, `BOT_MAX_DAILY_LOSS`. Orders are rounded to Binance lot size and minimum notional.
 
-Setup:
+### Control panel
+
+```bash
+npm install
+npm run dev          # or: npm run panel (production build)
+```
+
+Open http://localhost:3000. From the panel you can save your Binance API key (written only to the local `.env`), test the connection and see balances, switch dry/live mode, start/stop the bot, edit settings and watch positions, trades and logs.
+
+The panel only answers requests from the same computer. To use it from another PC over Tailscale, set `DASHBOARD_PASSWORD` in `.env` and start the panel with `HOST=0.0.0.0`; it will ask for the password.
+
+Manual setup without the panel:
 1. Binance → API Management → create a key with **Spot Trading only, withdrawals disabled**, restricted to your IP.
 2. `cp .env.example .env` and fill in the key.
 3. `npm run live` (dry run). Check the log and `bot/live/trades.log`.
