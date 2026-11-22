@@ -9,7 +9,10 @@
     "postinstall": "nuxt prepare",
     "bot": "node bot/index.mjs",
     "bot:once": "node bot/index.mjs --once",
-    "test:bot": "node --test bot/strategy.test.mjs"
+    "test:bot": "node --test bot/strategy.test.mjs",
+    "live": "node bot/live/index.mjs",
+    "live:once": "node bot/live/index.mjs --once",
+    "test:live": "node --test bot/live/live.test.mjs"
   },
   "devDependencies": {
     "@nuxt/devtools": "^1.0.3",

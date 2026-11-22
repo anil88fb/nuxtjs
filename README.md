@@ -75,3 +75,22 @@ npm run test:bot   # unit tests
 Keep it running in the background with pm2: `pm2 start bot/index.mjs --name kripto-bot`.
 
 Settings (env vars): `BOT_SYMBOLS` (default `BTCUSDT,ETHUSDT,SOLUSDT`), `BOT_INTERVAL` (`15m`), `BOT_POLL_SECONDS` (`60`), `BOT_EMA_FAST`, `BOT_EMA_SLOW`, `BOT_RSI_PERIOD`, `BOT_RSI_BUY_MAX`, `BOT_RSI_SELL_MIN`, `BOT_STOP_LOSS_PCT`, `BOT_TAKE_PROFIT_PCT`, `BOT_TRADE_SIZE_USDT` (`100`), `BOT_START_BALANCE` (`1000`), `BOT_FEE_PCT` (`0.1`), `BOT_STATE_FILE`, `BOT_BINANCE_BASE_URLS`.
+
+## Live Binance bot (real orders)
+
+`bot/live/` trades on your Binance Spot account. **Dry run by default**: nothing is bought or sold until `BOT_LIVE=true`.
+
+What it does every `BOT_POLL_SECONDS`:
+1. Reads your account. Coins you already hold (except `BOT_IGNORE_ASSETS`, stablecoins, Earn `LD*` assets) are managed too; their average buy price is computed from your trade history.
+2. Sells a position when net profit (after fees) ≥ `BOT_TAKE_PROFIT_PCT`, or on an EMA cross down if profit ≥ `BOT_MIN_PROFIT_PCT`, or at `BOT_STOP_LOSS_PCT` loss (`0` = never sell at a loss).
+3. Scans the `BOT_SCAN_TOP` most liquid `USDT` pairs and buys on EMA(9)/EMA(21) cross up with RSI < 70 and price above EMA(50), using market orders of `BOT_TRADE_SIZE`.
+
+Safety limits: `BOT_MAX_OPEN_POSITIONS`, `BOT_MAX_TOTAL` (total invested by the bot), `BOT_RESERVE`, `BOT_MAX_DAILY_LOSS`. Orders are rounded to Binance lot size and minimum notional.
+
+Setup:
+1. Binance → API Management → create a key with **Spot Trading only, withdrawals disabled**, restricted to your IP.
+2. `cp .env.example .env` and fill in the key.
+3. `npm run live` (dry run). Check the log and `bot/live/trades.log`.
+4. When happy, set `BOT_LIVE=true` in `.env` and run `pm2 start bot/live/index.mjs --name binance-bot`.
+
+`npm run test:live` runs the tests (uses a fake exchange, no network).

@@ -97,3 +97,6 @@ sw.*
 # bot paper-trading state
 bot/state.json
 bot/state.json.tmp
+bot/live/state-*.json
+bot/live/state-*.json.tmp
+bot/live/trades.log
