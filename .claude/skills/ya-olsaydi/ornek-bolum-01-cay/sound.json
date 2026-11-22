@@ -1,0 +1,21 @@
+{"voice": "work/voice.mp3",
+ "music": {"style": "mischief", "bpm": 112, "start": 0, "stop": 38.3, "sting": true, "level_db": -15},
+ "sfx": [
+  {"t": 0.1, "kind": "whoosh"},
+  {"t": 5.0, "kind": "magic"},
+  {"t": 6.0, "kind": "ding"},
+  {"t": 7.6, "kind": "pop"},
+  {"t": 13.5, "kind": "swish"},
+  {"t": 14.3, "kind": "tick"},
+  {"t": 15.0, "kind": "splash", "gain_db": -6},
+  {"t": 15.8, "kind": "buzz", "gain_db": -3},
+  {"t": 17.9, "kind": "impact"},
+  {"t": 22.2, "kind": "stamp"},
+  {"t": 22.8, "kind": "footsteps", "gain_db": -4},
+  {"t": 25.5, "kind": "whoosh"},
+  {"t": 26.3, "kind": "bell", "gain_db": -4},
+  {"t": 27.3, "kind": "magic", "gain_db": -3},
+  {"t": 31.7, "kind": "riser", "gain_db": -6},
+  {"t": 33.0, "kind": "success"},
+  {"t": 35.0, "kind": "ding", "gain_db": -3}
+ ]}

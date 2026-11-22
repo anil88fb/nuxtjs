@@ -132,6 +132,11 @@ Son olarak `bolumler.md` dosyasına bölümün satırını ekle, commit et ve pu
 - MP4'ü ve kapağı kullanıcıya dosya olarak gönder. Ağır çıktıları (frames/, work/) repoya
   commit etme. Bunlar repo dışındaki `~/ya-olsaydi/` klasöründe kalır.
 
+## Örnek bölüm
+
+`ornek-bolum-01-cay/` ilk bölümün çalışan kaynakları (story.js, script.txt, sound.json, meta.json). Yeni story.js yazarken
+yapıyı buradan al (çekim listesi, buhar, kart overlay, isim kartı), mekânı ve hikâyeyi değiştir.
+
 ## Yükleme ve otomasyon (Metricool)
 
 - **Metricool markası:** blogId `8286087`, saat dilimi `Europe/Istanbul`, YouTube `UC5BffrS1Ug88Pzo4_MTBsxg`

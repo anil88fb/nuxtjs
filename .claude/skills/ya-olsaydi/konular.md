@@ -7,7 +7,7 @@ Liste bitmeden 5 konu kala, aynı kurallarla (çeşitli mekân, korku/kan yok, g
 
 | Durum | # | Konu | Tahsin'in icadı / olay | Mekân | Gerçek bilgi (doğrulanacak) |
 |---|---|---|---|---|---|
-| [x] 2026-11-23 16:00 | 1 | Ya çay hiç soğumasaydı? | Hiç soğumayan çay bardağı | mahalle, kahve, ev | Türkiye kişi başı çay tüketiminde dünya birincisi, yılda 3 kg'dan fazla |
+| [x] 2026-11-22 19:40 | 1 | Ya çay hiç soğumasaydı? | Hiç soğumayan çay bardağı | mahalle, kahve, ev | Türkiye kişi başı çay tüketiminde dünya birincisi, yılda 3 kg'dan fazla |
 | [ ] | 2 | Ya hiç uyumasaydık? | Uykuyu kaldıran yastık | apartman, gece şehir | Randy Gardner 1964'te 11 gün (264 saat) uyumadan kaldı |
 | [ ] | 3 | Ya yerçekimi bir saatliğine kapansaydı? | Yerçekimi şalteri | pazar yeri | Ay'da yerçekimi Dünya'nınkinin yaklaşık altıda biri |
 | [ ] | 4 | Ya kediler konuşabilseydi? | Kedi tercüme tasması | sokak, balkon | Yetişkin kediler birbirlerine nadiren miyavlar, çoğunlukla insanlara miyavlar |
