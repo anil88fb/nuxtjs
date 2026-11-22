@@ -57,15 +57,16 @@ Do not offer those.
 
 ## Setup in this project (Linux / cloud session)
 
-Clips Kitty is not vendored here. If `/home/user/clips-kitty` (or a sibling `clips-kitty/`
-checkout) is missing, install it. Python 3.13 is too new for some pins; use 3.12:
+Clips Kitty is installed on demand, not in every session. When the user asks for clips
+and `curl -s http://127.0.0.1:8765/health` does not answer, run from the repo root:
 
 ```bash
-git clone --depth 1 https://github.com/ColinGPT9/clips-studio ../clips-kitty
-cd ../clips-kitty && uv venv -p 3.12 .venv && uv pip install -p .venv/bin/python -r requirements.txt
-.venv/bin/python main.py serve --port 8765      # run in the background
-curl -s http://127.0.0.1:8765/health            # {"ok":true,...}
+scripts/setup-clips-kitty.sh --serve
 ```
+
+It clones Clips Kitty to `../clips-kitty` (if missing), installs its Python 3.12
+dependencies (a few minutes on first run), starts the engine in the background and waits
+for `/health`. It is safe to rerun. Without `--serve` it only installs.
 
 Optionally register the MCP server (loads on the next session start):
 
