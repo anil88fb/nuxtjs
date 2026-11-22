@@ -139,9 +139,11 @@ Son olarak `bolumler.md` dosyasına bölümün satırını ekle, commit et ve pu
   kimliğini doğrula, eşleşmezse dur ve bildir.
 - **Yayın saatleri:** her gün **10:00** ve **16:00** (Metricool en iyi saat verisi). Tam otomatik yayın
   (kullanıcı kararı); onay beklemeden `autoPublish: true`.
-- **Video linki:** Metricool herkese açık bir URL ister. MP4'ü vidIQ'ya yükle:
-  `vidiq_video_upload` → `localFile {path, sizeBytes, contentType: "video/mp4"}`, dönen komutu çalıştır, sonra
-  `uploadId` ile tekrar çağırıp `videoUrl` al. Bu URL'yi Metricool `media` listesine ver.
+- **Video linki:** Metricool herkese açık bir URL ister. **vidIQ kullanma** (başka hesaba bağlı).
+  MP4'ü herkese açık `anil88fb/tuhaf-tahsin-videolar` reposuna koy: `bolumler/NN-kisa-ad.mp4` olarak commit et,
+  `main`'e push et. URL: `https://raw.githubusercontent.com/anil88fb/tuhaf-tahsin-videolar/main/bolumler/NN-kisa-ad.mp4`.
+  Oturumda repo yoksa `add_repo` (access: push) ile ekle ve `--depth 1` klonla. Repoyu küçük tutmak için
+  yayınlanmış (tarihi geçmiş) videoları birkaç günde bir sil.
 - **Gönderi:** `createScheduledPost`, `providers: [{"network":"youtube"}]`, `text` = açıklama,
   `youtubeData: {title, type: "short", privacy: "public", tags: [...], category: "FILM_ANIMATION",
   madeForKids: false, isAiGeneratedContent: false}`. Kapak için `videoCoverMilliseconds` verme (Shorts'ta
