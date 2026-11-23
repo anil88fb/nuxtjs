@@ -1,5 +1,6 @@
 // Tuhaf Tahsin #1 · Ya çay hiç soğumasaydı? (40,5 sn)
 import { TAHSIN } from "./tahsin.js";
+import { shot, dof as dof_ } from "./kadraj.js";
 export const meta = { fps: 30 };
 
 // [ilk kare, ad]  (work/phrases.json ile hizalı)
@@ -102,8 +103,8 @@ export function frame(f, E) {
       light = "interior";
       placeSteam(R.steamA, f, WX + 0.35, 1.32, 0.9, 2.2);
       A.push({ id: "tahsin", pos: [WX - 0.1, 0, -0.4], st: st(1, sh.name === "hook" ? { face: "wow", arms: "chin", look: 0.4 } : { face: "grin", arms: "point", look: 0.5 }) });
-      cam = E.camAt(f, [{ f: 0, pos: [WX + 0.25, 1.45, 2.6], look: [WX + 0.1, 1.4, -0.4], fov: 40 }, { f: 97, pos: [WX + 0.15, 1.55, 2.2], look: [WX, 1.55, -0.4], fov: 38 }]);
-      dof = { focus: [WX, 1.5, -0.4], amount: 8 };
+      cam = sh.name === "hook" ? E.camAt(f, [{ f: 0, ...shot("yakin", [WX - 0.1, 0, -0.4], { dx: 0.2 }) }, { f: 56, ...shot("yakin", [WX - 0.1, 0, -0.4], { dx: 0.15, push: 0.6 }) }]) : E.camAt(f, [{ f: 57, ...shot("orta", [WX - 0.1, 0, -0.4], { side: -0.2 }) }, { f: 96, ...shot("orta", [WX - 0.1, 0, -0.4], { side: -0.1, push: 0.5 }) }]);
+      dof = dof_(sh.name === "hook" ? "yakin" : "orta", [WX, 1.4, -0.4]);
       FX.push({ kind: sh.name === "hook" ? "question" : "idea", pos: [WX + 0.55, 2.65, -0.4], size: 0.55, t: t / 30 });
       if (sh.name === "name") overlay = nameCard;
       break;
@@ -112,8 +113,8 @@ export function frame(f, E) {
       light = "interior";
       A.push({ id: "tahsin", pos: [WX - 0.35, 0, -1.7], st: st(2, { face: f < 150 ? "think" : "grin", arms: f < 150 ? "chin" : "up", prop: f >= 150 ? cup() : null, look: 0.6 }) });
       placeSteam(R.steamB, f, WX + 0.25, 1.05, -2.3, 1.6);
-      cam = E.camAt(f, [{ f: 97, pos: [WX + 0.6, 1.7, 1.6], look: [WX, 1.2, -2.2], fov: 40 }, { f: 208, pos: [WX + 0.3, 1.6, 0.9], look: [WX - 0.1, 1.4, -2.2], fov: 38 }]);
-      dof = { focus: [WX, 1.2, -2.1], amount: 8 };
+      cam = E.camAt(f, [{ f: 97, ...shot("genis", [WX - 0.2, 0, -1.9], { side: -0.25 }) }, { f: 208, ...shot("orta", [WX - 0.2, 0, -1.9], { side: -0.15 }) }]);
+      dof = dof_("orta", [WX, 1.2, -2.0]);
       if (f >= 150) FX.push({ kind: "idea", pos: [WX - 0.1, 2.7, -1.7], size: 0.6, t: (f - 150) / 30 }, { kind: "stars", pos: [WX - 0.3, 2.3, -1.6], size: 0.8, t: (f - 150) / 30 });
       flash = flashIn(150, 5) * 0.6;
       break;
@@ -126,18 +127,18 @@ export function frame(f, E) {
       A.push({ id: "kom2", pos: [-2.4, 0, -6.1], st: st(5, { face: "happy", arms: "wave" }) });
       A.push({ id: "amca1", pos: [0.9, 0, -5.9], st: st(6, { face: "happy", arms: "holdR", prop: cup(), legs: "sit" }) });
       A.push({ id: "amca2", pos: [-0.65, 0, -5.4], st: st(7, { face: "laugh", arms: "holdR", prop: cup(), legs: "sit" }), yaw: 0.6 });
-      const shots = [{ pos: [-1.2, 1.65, -2.6], look: [-1.6, 1.55, -5.6], fov: 40 }, { pos: [-1.6, 1.8, -1.4], look: [-1.5, 1.5, -6], fov: 44 }, { pos: [0.5, 2.3, -0.6], look: [0.2, 1.1, -5.5], fov: 46 }];
+      const shots = [shot("genis", [-0.8, 0, -5.8]), shot("orta", [-1.6, 0, -5.9], { side: -0.2 }), shot("orta", [0.2, 0, -5.6], { side: 0.3 })];
       cam = E.camAt(f, [{ f: sh.f0, ...shots[who] }]);
       FX.push({ kind: "hearts", pos: who === 0 ? [-1.3, 2.6, -5.6] : who === 1 ? [-1.5, 2.8, -6] : [0.4, 2.2, -5.6], size: 0.6, t: (t % 40) / 40 });
-      dof = { focus: shots[who].look, amount: 7 };
+      dof = dof_(who === 0 ? "genis" : "orta", shots[who].look);
       break;
     }
     case "problem": {
       light = "day";
       placeSteam(R.steamA, f, 0.0, 0.88, -5.2, 2.6); placeSteam(R.steamB, f, 0.4, 0.88, -5.1, 2.6);
       A.push({ id: "tahsin", pos: [0.9, 0, -5.9], st: st(8, { face: "nervous", arms: "hip", sweat: true, look: -0.6 }) });
-      cam = E.camAt(f, [{ f: 327, pos: [0.15, 1.2, -3.6], look: [0.2, 0.9, -5.2], fov: 38 }, { f: 404, pos: [0.15, 1.05, -4.1], look: [0.2, 0.9, -5.2], fov: 34 }]);
-      dof = { focus: [0.2, 0.9, -5.2], amount: 10 };
+      cam = E.camAt(f, [{ f: 327, ...shot("orta", [0.5, 0, -5.6], { side: 0.15 }) }, { f: 404, ...shot("orta", [0.5, 0, -5.6], { side: 0.1, push: 0.7 }) }]);
+      dof = dof_("orta", [0.3, 1.0, -5.4]);
       break;
     }
     case "tries": {
@@ -146,22 +147,22 @@ export function frame(f, E) {
       placeSteam(R.steamA, f, 0.0, 0.88, -5.2, 1.4);
       A.push({ id: "amca2", pos: [-0.65, 0, -5.4], st: st(7, { face: ["talk", "sleep", "determined", "sad"][b], arms: b === 2 ? "reach" : "cross", legs: "sit", talk: b === 0 ? 0.8 : 0 }), yaw: 0.6 });
       A.push({ id: "amca1", pos: [0.9, 0, -5.9], st: st(6, { face: ["neutral", "sleep", "wow", "sad"][b], arms: "cross", legs: "sit" }) });
-      cam = E.camAt(f, [{ f: 405, pos: [0.2, 1.5, -2.4], look: [0.1, 1.0, -5.5], fov: 46 }, { f: 489, pos: [0.2, 1.45, -2.8], look: [0.1, 1.0, -5.5], fov: 44 }]);
+      cam = E.camAt(f, [{ f: 405, ...shot("orta", [0.1, 0, -5.5], { side: -0.15 }) }, { f: 489, ...shot("orta", [0.1, 0, -5.5], { side: -0.05, push: 0.5 }) }]);
       if (b === 0) FX.push({ kind: "lines", pos: [-0.25, 1.0, -5.25], size: 0.35, t: t / 20 });
       if (b === 1) FX.push({ kind: "zzz", pos: [-0.4, 1.7, -5.4], size: 0.5, t: (f - 428) / 22 });
       if (b === 2) FX.push({ kind: "sparkle", pos: [0.0, 1.0, -5.2], size: 0.35, t: (f - 450) / 22 });
       if (b === 3) FX.push({ kind: "puff", pos: [0.0, 1.0, -5.2], size: 0.5, t: (f - 473) / 17 }, { kind: "cross", pos: [0.0, 1.55, -5.2], size: 0.35 });
-      dof = { focus: [0.0, 1.0, -5.3], amount: 7 };
+      dof = dof_("orta", [0.0, 1.0, -5.4]);
       break;
     }
     case "burn": {
       light = "day";
       const ids = ["anne", "kom1", "kom2", "amca1", "amca2", "cocuk"];
       ids.forEach((id, i) => A.push({ id, pos: [-1.9 + i * 0.75, 0, -5.6 - (i % 2) * 0.5], st: st(10 + i, { face: i % 2 ? "shock" : "angry", arms: i % 3 === 0 ? "up" : "facepalm", sweat: true }) }));
-      cam = E.camAt(f, [{ f: 490, pos: [-0.2, 2.2, 1.4], look: [-0.2, 1.3, -5.7], fov: 48 }, { f: 550, pos: [-0.2, 2.0, 0.6], look: [-0.2, 1.4, -5.7], fov: 46 }]);
+      cam = E.camAt(f, [{ f: 490, ...shot("genis", [0, 0, -5.8]) }, { f: 550, ...shot("genis", [0, 0, -5.8], { push: 0.6 }) }]);
       const [sx, sy] = E.shake(f, E.at("yandı"), 0.12, 10); cam.pos[0] += sx; cam.pos[1] += sy;
       ids.forEach((_, i) => FX.push({ kind: i % 2 ? "anger" : "exclaim", pos: [-1.9 + i * 0.75 + 0.3, 2.55, -5.6 - (i % 2) * 0.5], size: 0.42, t: t / 30 }));
-      dof = { focus: [-0.2, 1.4, -5.7], amount: 4 };
+      dof = dof_("genis", [0, 1.3, -5.8]);
       break;
     }
     case "second": {
@@ -170,24 +171,24 @@ export function frame(f, E) {
       A.push({ id: "amca1", pos: [0.9, 0, -5.9], st: st(6, { face: "sad", arms: "chin", legs: "sit" }) });
       A.push({ id: "amca2", pos: [-0.65, 0, -5.4], st: st(7, { face: "sad", arms: "cross", legs: "sit" }), yaw: 0.6 });
       A.push({ id: "riza", pos: [2.2, 0, -6.4], st: st(9, { face: "nervous", arms: "hold", prop: { kind: "cup", hand: "l", col: TEA }, sweat: true }) });
-      cam = E.camAt(f, [{ f: 551, pos: [0.8, 1.6, -1.6], look: [0.8, 1.1, -5.7], fov: 46 }, { f: 618, pos: [1.0, 1.5, -2.2], look: [0.9, 1.1, -5.7], fov: 44 }]);
-      dof = { focus: [0.9, 1.1, -5.7], amount: 6 };
+      cam = E.camAt(f, [{ f: 551, ...shot("orta", [1.0, 0, -5.9], { side: 0.2 }) }, { f: 618, ...shot("orta", [1.0, 0, -5.9], { side: 0.1, push: 0.5 }) }]);
+      dof = dof_("orta", [0.9, 1.1, -5.9]);
       break;
     }
     case "closed": {
       light = ["golden", "dramatic", X.span(f, 619, 680)];
       A.push({ id: "riza", pos: [2.0, 0, -6.6], st: st(9, { face: "sad", arms: "hang", headTilt: -6 }) });
-      cam = E.camAt(f, [{ f: 619, pos: [2.0, 2.0, -2.0], look: [2.0, 2.0, -7.0], fov: 46 }, { f: 679, pos: [2.0, 2.1, -2.8], look: [2.0, 2.1, -7.0], fov: 44 }]);
+      cam = E.camAt(f, [{ f: 619, ...shot("genis", [2.0, 0, -6.6], { dy: 0.4, lookDy: 0.6 }) }, { f: 679, ...shot("genis", [2.0, 0, -6.6], { dy: 0.3, lookDy: 0.5, push: 0.6 }) }]);
       if (f >= kap - 2) FX.push({ kind: "puff", pos: [2.0, 2.4, -6.9], size: 0.8, t: X.span(f, kap - 2, kap + 14) });
-      dof = { focus: [2.0, 2.0, -6.8], amount: 5 };
+      dof = dof_("genis", [2.0, 1.8, -6.8]);
       break;
     }
     case "collect": {
       light = "golden";
       const x = X.keyed(f, [[680, -5.5], [765, -1.2]]);
       A.push({ id: "tahsin", pos: [x, 0, -5.4], st: st(1, { face: "determined", legs: "walk", phase: t / 24, arms: "holdR", prop: cup() }) });
-      cam = { pos: [x + 0.6, 1.6, -2.2], look: [x + 0.2, 1.35, -5.4], fov: 44 };
-      dof = { focus: [x, 1.4, -5.4], amount: 7 };
+      cam = shot("genis", [x, 0, -5.4], { side: 0.35 });
+      dof = dof_("genis", [x, 1.3, -5.4]);
       break;
     }
     case "winter": {
@@ -195,9 +196,9 @@ export function frame(f, E) {
       R.lampOn.visible = true;
       R.snow.forEach((m, i) => { const r1 = (i * 0.618) % 1, r2 = (i * 0.37) % 1, p = ((f - 765) / 30 * 0.35 + r1) % 1; m.visible = true; m.position.set(-4 + r2 * 6 + 0.2 * Math.sin(p * 8 + i), 4.5 - p * 4.5, -1.5 - ((i * 0.13) % 1) * 4.5); });
       A.push({ id: "tahsin", pos: [-1.2, 0, -5.4], st: st(1, { face: "shock", arms: "up" }) });
-      cam = E.camAt(f, [{ f: 765, pos: [-1.2, 1.7, -2.0], look: [-1.2, 1.7, -5.4], fov: 46 }, { f: 814, pos: [-1.2, 2.2, -1.2], look: [-1.2, 2.0, -5.4], fov: 52 }]);
+      cam = E.camAt(f, [{ f: 765, ...shot("genis", [-1.2, 0, -5.4], { dy: 0.5 }) }, { f: 814, ...shot("genis", [-1.2, 0, -5.4], { dy: 0.8, push: 0.5 }) }]);
       flash = flashIn(767, 6);
-      dof = { focus: [-1.2, 1.6, -5.4], amount: 5 };
+      dof = dof_("genis", [-1.2, 1.5, -5.4]);
       break;
     }
     case "homes": {
@@ -207,29 +208,29 @@ export function frame(f, E) {
       A.push({ id: "tahsin", pos: [HX + 0.55, 0, -2.6], st: st(1, { face: "smug", arms: "present", look: 0.7 }) });
       R.glowL.intensity = 6 + 1.5 * Math.sin(f / 5);
       const stove = f >= 895;
-      cam = stove ? E.camAt(f, [{ f: 895, pos: [HX + 1.0, 1.7, 0.9], look: [HX + 2.7, 1.2, -2.9], fov: 46 }, { f: 949, pos: [HX + 1.2, 1.6, 0.4], look: [HX + 2.7, 1.2, -2.9], fov: 44 }])
-        : E.camAt(f, [{ f: 815, pos: [HX + 0.1, 2.1, 2.6], look: [HX, 1.25, -2.3], fov: 44 }, { f: 894, pos: [HX + 0.2, 1.9, 1.8], look: [HX, 1.3, -2.3], fov: 42 }]);
+      cam = stove ? E.camAt(f, [{ f: 895, ...shot("orta", [HX + 2.6, 0, -2.9], { side: -0.35 }) }, { f: 949, ...shot("orta", [HX + 2.6, 0, -2.9], { side: -0.3, push: 0.5 }) }])
+        : E.camAt(f, [{ f: 815, ...shot("genis", [HX, 0, -2.4], { scale: 0.75 }) }, { f: 894, ...shot("orta", [HX, 0, -2.4]) }]);
       if (stove) FX.push({ kind: "zzz", pos: [HX + 2.9, 1.5, -2.9], size: 0.5, t: (f - 895) / 30 });
       else FX.push({ kind: "sparkle", pos: [HX, 1.1, -1.75], size: 0.6, t: t / 30 });
-      dof = { focus: stove ? [HX + 2.9, 1.0, -2.9] : [HX, 1.1, -2.2], amount: 6 };
+      dof = dof_(stove ? "orta" : "genis", stove ? [HX + 2.9, 1.0, -2.9] : [HX, 1.1, -2.3]);
       break;
     }
     case "fact": {
       light = "interior";
       placeSteam(R.steamA, f, WX + 0.35, 1.32, 0.9, 2.2);
       A.push({ id: "tahsin", pos: [WX - 0.1, 0, -0.4], st: st(1, { face: "happy", arms: "present", prop: cup(), look: 0.4 }) });
-      cam = E.camAt(f, [{ f: 950, pos: [WX + 0.2, 1.4, 3.2], look: [WX, 1.35, -0.4], fov: 42 }, { f: 1151, pos: [WX + 0.1, 1.45, 2.7], look: [WX, 1.4, -0.4], fov: 40 }]);
+      cam = E.camAt(f, [{ f: 950, ...shot("orta", [WX - 0.1, 0, -0.4], { side: 0.2, lookDy: 0.55 }) }, { f: 1151, ...shot("orta", [WX - 0.1, 0, -0.4], { side: 0.1, lookDy: 0.55, push: 0.4 }) }]);
       const show = X.span(f, 985, 1000);
       if (show > 0) overlay = (g, w, h) => { g.save(); g.globalAlpha = show; card([["GERÇEKTE", 54, "#e8742c", 80], ["Türkiye", 118, "#fbf5ea", 190], ["kişi başı çay tüketiminde", 46, "#fbf5ea", 290], ["DÜNYA BİRİNCİSİ", 76, "#ffcf4a", 370], ["yılda 3 kilodan fazla", 46, "#2fa39a", 450]])(g, w, h); g.restore(); };
-      dof = { focus: [WX, 1.4, -0.4], amount: 6 };
+      dof = dof_("orta", [WX, 1.3, -0.4]);
       break;
     }
     case "end": {
       light = "interior";
       A.push({ id: "tahsin", pos: [WX - 0.1, 0, -0.4], st: st(1, { face: "nervous", arms: "shrug", sweat: true, look: 0 }) });
-      cam = E.camAt(f, [{ f: 1152, pos: [WX, 1.6, 2.2], look: [WX, 1.6, -0.4], fov: 40 }, { f: END, pos: [WX, 1.65, 1.5], look: [WX, 1.65, -0.4], fov: 36 }]);
+      cam = E.camAt(f, [{ f: 1152, ...shot("orta", [WX - 0.1, 0, -0.4]) }, { f: END, ...shot("yakin", [WX - 0.1, 0, -0.4]) }]);
       FX.push({ kind: "question", pos: [WX + 0.55, 2.7, -0.4], size: 0.55, t: t / 30 });
-      dof = { focus: [WX, 1.6, -0.4], amount: 8 };
+      dof = dof_("yakin", [WX, 1.6, -0.4]);
       break;
     }
   }

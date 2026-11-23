@@ -92,9 +92,27 @@ cp .claude/skills/ya-olsaydi/tahsin.js ~/ya-olsaydi/<bolum-kisa-adi>/
 
 `story.js` içinde `import { TAHSIN } from "./tahsin.js";` ile karakteri kur. Kanala özel
 çekim kuralları:
-- **Kare 0:** Tahsin yakın planda, merak dolu yüzle, olayın nesnesiyle birlikte görünür.
-- **Final:** Tahsin'in tepki yakın planı (genelde `nervous` + `shrug` + `sweat`), ters köşe
-  nesnesi arkada. "Peki sen olsan ne yapardın?" cümlesinde kamera ona doğru yavaşça yaklaşır.
+### Kadraj kuralları (kullanıcı kararı: daha geniş, mekân belirgin)
+
+Kameraları elle yazma; `kadraj.js`'i projeye kopyala ve `shot(tür, ayakNoktası, ayar)` kullan
+(örnek: `ornek-bolum-01-cay/story.js`).
+- **Çekimlerin en az %75'i `genis` ya da `orta`.** Karakter tam boy görünür; ayakları kadrajda.
+- **Her yeni mekân `genis` bir açılış planıyla başlar:** binalar, oda, gökyüzü, tezgâh, sokak
+  okunur. İzleyici nerede olduğunu ilk bakışta anlamalı.
+- **`yakin` en fazla 2 çekim:** kanca (ilk 2 sn) ve final tepkisi. Nesne detayı gerekiyorsa
+  `orta` planda nesneyi karakterle birlikte göster, kamerayı nesnenin dibine sokma.
+- **Alan derinliği düşük:** `dof(tür, odak)` kullan (genis 1.5, orta 2.5). Arka plan bulanık
+  bir leke değil, okunabilir bir mekân olmalı.
+- **Mekânı doldur:** karakterin iki yanında ve arkasında set parçaları olsun (tezgâh, masa,
+  lamba, ağaç, tabela, raf). Boş duvar önünde çekim yapma.
+- Overlay kartı (Gerçekte...) olan çekimde `lookDy: 0.5` ver ki karakter kartın altında kalsın.
+- Kontak sayfasında kontrol et: karakter karenin üst yarısını tek başına dolduruyorsa çekim fazla
+  yakın; `orta`ya ya da `genis`e çevir.
+
+- **Kare 0:** Tahsin `yakin` planda, merak dolu yüzle, olayın nesnesiyle birlikte görünür;
+  2. saniyede `orta`/`genis`e açıl.
+- **Final:** Tahsin'in tepki planı (genelde `nervous` + `shrug` + `sweat`): `orta`dan başla,
+  "Peki sen olsan ne yapardın?" cümlesinde `yakin`a doğru yavaşça yaklaş.
 - Bir bölüm içinde kadro, kıyafetler ve mekân değişiklikleri tutarlı kalır. Yok olan geri
   gelmez, yıkılan kendiliğinden düzelmez.
 
@@ -135,7 +153,7 @@ Son olarak `bolumler.md` dosyasına bölümün satırını ekle, commit et ve pu
 ## Örnek bölüm
 
 `ornek-bolum-01-cay/` ilk bölümün çalışan kaynakları (story.js, script.txt, sound.json, meta.json). Yeni story.js yazarken
-yapıyı buradan al (çekim listesi, buhar, kart overlay, isim kartı), mekânı ve hikâyeyi değiştir.
+yapıyı buradan al (çekim listesi, `kadraj.js` ile kameralar, buhar, kart overlay, isim kartı), mekânı ve hikâyeyi değiştir.
 
 ## Yükleme ve otomasyon (Metricool)
 
