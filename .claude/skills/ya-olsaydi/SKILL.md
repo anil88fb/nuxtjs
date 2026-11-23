@@ -1,6 +1,6 @@
 ---
 name: ya-olsaydi
-description: "Ya Olsaydı?" YouTube kanalı için Tuhaf Tahsin'li yeni bölüm üretir: fikir, Türkçe senaryo, ElevenLabs seslendirmesi, cizgi-short ile animasyon, bitmiş 9:16 MP4 ve yükleme paketi (kapak, başlık, açıklama). "Yeni bölüm", "Ya Olsaydı videosu", "Tahsin'li video", "kanal için video yap" isteklerinde kullan.
+description: "Ya Olsaydı?" YouTube kanalı için Tuhaf Tahsin'li yeni bölüm üretir: fikir, Türkçe senaryo, Speko seslendirmesi, cizgi-short ile animasyon, bitmiş 9:16 MP4 ve yükleme paketi (kapak, başlık, açıklama). "Yeni bölüm", "Ya Olsaydı videosu", "Tahsin'li video", "kanal için video yap" isteklerinde kullan.
 ---
 
 # Tuhaf Tahsin · bölüm üretimi
@@ -8,7 +8,7 @@ description: "Ya Olsaydı?" YouTube kanalı için Tuhaf Tahsin'li yeni bölüm �
 Kanal: **Tuhaf Tahsin** (YouTube `UC5BffrS1Ug88Pzo4_MTBsxg`), seri adı **Ya Olsaydı?** Türkçe, dikey (9:16) animasyonlu "ya … olsaydı?" hikâyeleri.
 Ana karakter: **Tuhaf Tahsin**. Her bölümde aynı görünür; yan karakterler, mekân ve renkler
 hikâyeye göre değişir. Üretim tamamen bu oturumda yapılır: senaryo burada yazılır, ses
-ElevenLabs'te üretilir, video `cizgi-short` kitiyle çizilir.
+Speko ile üretilir, video `cizgi-short` kitiyle çizilir.
 
 Bu skill, `cizgi-short` skill'inin üzerine kurulur. Motor API'si, kurulum, zamanlama, render
 ve ses mikslemesi için `.claude/skills/cizgi-short/SKILL.md` geçerlidir. Burada sadece kanala
@@ -24,7 +24,8 @@ ve ses mikslemesi için `.claude/skills/cizgi-short/SKILL.md` geçerlidir. Burad
   Fikir bulunca parmağını kaldırır (`fx: idea`). İmza aksesuarı büyüteç.
 - **Konuşmaz.** Bütün hikâyeyi anlatıcı anlatır. Karakterler sadece mimik ve jestle tepki verir
   (`talk: 0`). Konuşma balonu yok.
-- **Anlatıcı sesi:** ElevenLabs `isa - Istanbul Turkish`, voice_id `fkLVUvPhQxHhQGCjXRMA`.
+- **Anlatıcı sesi (2026-11-23'ten itibaren):** Speko üzerinden xAI **Cosmo** (`voice: "cosmo"`, sağlayıcı `xai`).
+  Canlı, samimi erkek ses; Türkçe telaffuzu doğrulandı. ElevenLabs KULLANILMAZ (bulut görevlerinde indirilemiyor).
   Sıcak, enerjik, İstanbul Türkçesi. Her bölümde aynı ses.
 - **Görsel stil:** Düz 2D karakterler, boyalı dokulu 3D dünya (cizgi-short'un varsayılanı).
   Beyaz yuvarlak yüzler kanalın imzası: yan karakterlere de `skin: "#ffffff"` ver.
@@ -64,25 +65,20 @@ Türkçede ~2,6 kelime/sn: 30 sn ≈ 75 kelime, 45 sn ≈ 115, 60 sn ≈ 155.
 Kullanıcıya gönder: kopyalanabilir senaryo, kelime sayısı, tahmini süre ve tek paragraf
 görsel plan. Onay ya da düzeltme bekle. Bu, akıştaki son onay noktası.
 
-## Aşama 3: Seslendirme (ElevenLabs)
+## Aşama 3: Seslendirme (Speko · xAI Cosmo)
 
-Onaydan sonra `creative_generate_speech` ile seslendir: voice_id `fkLVUvPhQxHhQGCjXRMA`,
-metin = onaylanan senaryo, tek üretim. Durumu `creative_get_flow_run_status` ile izle. Bitince
-sesi indirip `work/voice.mp3` olarak koy; okunan metni `script.txt` yap.
-
-- Üretim ücretsiz plandan karakter harcar (ayda 10.000). Kalan hakkı `account_get_usage` ile
-  kontrol et. Senaryo kalan haktan uzunsa kullanıcıya söyle.
-- Başarısız üretimi aynı çağrıyla tekrarlama (ikinci kez ücret alır). Önce durumu kontrol et.
-- Model `eleven_v4`, tek üretim (`generations_count: 1`). Duygu etiketleri ([curious], [excited]...) serbest;
-  `script.txt` ise etiketsiz düz metin olmalı. Ses dosyası `elevenlabsusercontent.com`'dan indirilir.
-- **Önce ağı dene, sonra üret:** ElevenLabs'te üretmeden ÖNCE `curl -sI https://elevenlabsusercontent.com`
-  ile indirme sunucusuna erişimi kontrol et. Proxy 403 veriyorsa ElevenLabs'te HİÇ üretme (kredi boşa gider),
-  doğrudan Speko yedeğini kullan.
-- **Yedek: Speko.** ElevenLabs kredisi yetmezse (`account_get_usage`: kalan < senaryo karakteri + 100) ya da
-  üretim kredi hatasıyla düşerse `audio_synthesize` kullan: `{"text": <etiketsiz metin>, "intent": {"language": "tr"},
-  "voice": "91e91d74-8eb4-43cd-97d3-7466c21db00d", "constraints": {"allowedProviders": {"tts": ["cartesia"]}}}`
-  (Cartesia "Aykut - Friendly Companion"). Base64 sesi ya da indirme linkini `work/voice.mp3` (veya .wav) olarak kaydet.
-- Kullanıcı kendi sesini yüklerse ElevenLabs'i atla.
+Onaydan sonra Speko `audio_synthesize` ile seslendir:
+```json
+{"text": "<etiketsiz senaryo>", "intent": {"language": "tr"}, "voice": "cosmo",
+ "constraints": {"allowedProviders": {"tts": ["xai"]}}}
+```
+- Sonuç büyükse araç sesi bir `.wav` dosyasına kaydeder ve yolunu yazar ("Binary content (audio/wav) saved to ...");
+  o dosyayı `work/voice.wav` olarak kopyala (ya da sonuçtaki imzalı `url`'den 15 dk içinde indir).
+- Tek üretim yap, aynı metni tekrar üretme. `script.txt` etiketsiz düz metin olmalı (ses etiketleri yok).
+- Cosmo hızlı konuşur (~180 kelime/dk): 30-45 sn için 85-125 kelime yaz.
+- Cosmo hata verirse yedek: aynı gövde, `"voice": "91e91d74-8eb4-43cd-97d3-7466c21db00d"`, sağlayıcı `cartesia` (Aykut).
+- Speko bakiyesi `credits_balance_get` ile görülebilir; $0,50'nin altındaysa özette kullanıcıyı uyar.
+- Kullanıcı kendi sesini yüklerse Speko'yu atla.
 
 ## Aşama 4: Video (cizgi-short)
 
