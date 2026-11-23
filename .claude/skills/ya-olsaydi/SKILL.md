@@ -75,6 +75,9 @@ sesi indirip `work/voice.mp3` olarak koy; okunan metni `script.txt` yap.
 - Başarısız üretimi aynı çağrıyla tekrarlama (ikinci kez ücret alır). Önce durumu kontrol et.
 - Model `eleven_v4`, tek üretim (`generations_count: 1`). Duygu etiketleri ([curious], [excited]...) serbest;
   `script.txt` ise etiketsiz düz metin olmalı. Ses dosyası `elevenlabsusercontent.com`'dan indirilir.
+- **Önce ağı dene, sonra üret:** ElevenLabs'te üretmeden ÖNCE `curl -sI https://elevenlabsusercontent.com`
+  ile indirme sunucusuna erişimi kontrol et. Proxy 403 veriyorsa ElevenLabs'te HİÇ üretme (kredi boşa gider),
+  doğrudan Speko yedeğini kullan.
 - **Yedek: Speko.** ElevenLabs kredisi yetmezse (`account_get_usage`: kalan < senaryo karakteri + 100) ya da
   üretim kredi hatasıyla düşerse `audio_synthesize` kullan: `{"text": <etiketsiz metin>, "intent": {"language": "tr"},
   "voice": "91e91d74-8eb4-43cd-97d3-7466c21db00d", "constraints": {"allowedProviders": {"tts": ["cartesia"]}}}`
