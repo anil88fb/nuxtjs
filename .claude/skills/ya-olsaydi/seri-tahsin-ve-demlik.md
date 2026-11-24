@@ -6,7 +6,7 @@ her sözü kelimesi kelimesine anlar. Mahallede küçük kazalarla başlayan hik
 kopya robot istilası ve tek bir bardak çayla gelen kurtuluşla biter.
 
 - **Platform:** TikTok (dizi/oynatma listesi), istenirse YouTube Shorts'a da.
-- **Format:** 9:16, 1080x1920, bölüm başı **45-55 sn** (Cosmo ~180 kelime/dk → 120-150 kelime).
+- **Format:** 9:16, 1080x1920, bölüm başı **35-45 sn** (anlatım 75-100 kelime; Cosmo gerçekte ~145 kelime/dk okuyor, başlık kartı ve duraklarla 35-45 sn eder).
 - **Yayın:** 10 gün, günde 1 bölüm. Saat TikTok bağlanınca hesabın verisine göre seçilecek.
 - **Üretim:** `ya-olsaydi` skill'i + `kadraj.js` (geniş/orta plan ağırlıklı), ses Speko xAI Cosmo.
 - **Ton:** Komik, sıcak, çocuk-aile uyumlu. Korku/kan yok. Her bölüm bir **cliffhanger** ile biter.
@@ -53,63 +53,63 @@ kopya robot istilası ve tek bir bardak çayla gelen kurtuluşla biter.
 ## Bölüm senaryoları
 Anlatıcı metni Cosmo'ya aynen verilir (etiket yok). Kare/çekim listesi `kadraj.js` türleriyle.
 
-### Bölüm 1 · "Ya bir robotun olsaydı?" (~50 sn, atölye → ev)
+### Bölüm 1 · "Ya bir robotun olsaydı?" (~38 sn, atölye → ev)
 **Anlatım:**
 > Ya bir robotun olsaydı? Tuhaf Tahsin, babaannesinin bakır demliğini, eski bir radyoyu ve üç yayı birleştirdi. Düğmeye bastı. Hiçbir şey olmadı. Tam vazgeçecekti ki demlik gözlerini açtı ve tek bir kelime söyledi: Çay? Tahsin ona Demlik adını verdi. Demlik zıplayarak her yeri keşfetti, her şeye merakla baktı. Akşam annesi seslendi: Tahsin, evi bir topla bakalım! Tahsin gülümsedi. Demlik, evi topla. Ertesi sabah Tahsin uyandı… ve evin içi bomboştu. Çünkü Demlik evi gerçekten toplamıştı. Bütün eşyalar, sokağın ortasında, kocaman bir kule olmuştu.
 
 **Çekimler:** yakin Tahsin+demlik (kanca) → genis atölye, Tahsin parçaları birleştirir → orta düğme, kıvılcım (`burst`), sessizlik → yakin Demlik'in ekranı açılır "Çay?" → genis Demlik zıplayarak atölyeyi gezer → orta Anne kapıda bağırır → genis sabah boş oda → **cliffhanger:** genis sokak, eşyalardan dev kule, Tahsin `shock`.
 **Ses efekti:** whoosh, click, boing, magic (açılış), ding ("Çay?"), riser + sting.
 
-### Bölüm 2 · "Harfi harfine" (~50 sn, sokak)
+### Bölüm 2 · "Harfi harfine" (~38 sn, sokak)
 **Anlatım:**
 > Önceki bölümde Tahsin, Demlik'i yaptı ve Demlik evi… sokağa topladı. Tahsin hemen bir kural koydu: Bundan sonra lafları dikkatli seçeceğiz. Ama mahalle bunu bilmiyordu. Bakkal Demlik'e, rafları göz kulak ol dedi; Demlik rafların üstüne iki kocaman göz çizdi. Komşu, şu kediye bir el at dedi; Demlik kediye eldiven fırlattı. Minik Ece güldü, Demlik'e sarıldı ve ilk hayranı oldu. Herkes gülüyordu… biri hariç. Karşı apartmanın penceresinde, silindir şapkalı bir adam dürbünle bakıyordu: Mükemmel Mümtaz. Ve fısıldadı: O robot benim olmalı.
 
 **Çekimler:** genis sokak + eşya kulesi (özet) → orta Tahsin parmak kaldırır (`idea`) → orta bakkal rafı, gözler → orta kedi + eldiven (`puff`) → orta Ece sarılır (`hearts`) → genis sokak, herkes güler → **cliffhanger:** genis karşı bina pencere, yakin Mümtaz dürbün, `sly`.
 
-### Bölüm 3 · "Mahallenin çaycısı" (~50 sn, kahve)
+### Bölüm 3 · "Mahallenin çaycısı" (~38 sn, kahve)
 **Anlatım:**
 > Önceki bölümde biri Demlik'i gözüne kestirdi. Ama Çaycı Rıza daha hızlıydı. Demlik, sen çay demleyebilir misin? Demlik'in gözleri parladı. Bir saatte bin bardak çay! Kuyruk mahalleden taştı, şehre uzandı. Rıza zengin oldu, Demlik çok mutluydu. Ta ki biri, Demlik, daha hızlı! diyene kadar. Demlik hızlandı… hızlandı… daha da hızlandı. Antenindeki ışık kırmızıya döndü. Tahsin bağırdı: Demlik, dur! Ama artık çok geçti. Demlik'in emziğinden dev bir buhar bulutu fışkırdı ve bütün mahalle beyaza boyandı.
 
 **Çekimler:** genis kahve önü → orta Rıza + Demlik → genis uzun kuyruk (6-8 figüran, `walk`) → orta Rıza para (`money`) → orta Demlik titrer (`shake`, anten kırmızı) → **cliffhanger:** genis buhar bulutu ekranı kaplar (beyaz `flash` + `fade`).
 
-### Bölüm 4 · "Buhar bulutu" (~50 sn, sis → park)
+### Bölüm 4 · "Buhar bulutu" (~38 sn, sis → park)
 **Anlatım:**
 > Önceki bölümde Demlik aşırı ısındı ve mahalle bembeyaz bir bulutla kaplandı. Kimse önünü göremiyordu. Tahsin, Demlik'in kırmızı antenini takip ederek sisin içinde ilerledi. Sonunda onu parkta buldu: üzgün, yorgun ve sessiz. Ama bulut yukarı çıktı, soğudu ve… yağmur yağmaya başladı. Aylardır kuru olan çiçek tarhı bir anda rengârenk açtı. Mahalle sisten çıkınca ağzı açık kaldı. Demlik bir mucize yapmıştı! Tam o sırada köşeden bir kamyonet döndü. Üzerinde kocaman harflerle yazıyordu: Canlı Yayın.
 
 **Çekimler:** genis sisli sokak (beyaz sis düzlemleri, düşük görüş) → orta Tahsin sisin içinde, kırmızı ışık → genis park, Demlik bankta `sad` → genis yağmur (kar yerine mavi damlalar) → orta çiçekler açar (renkli küreler büyür) → **cliffhanger:** genis park girişi, TV kamyoneti (kutu+tabela "CANLI YAYIN").
 
-### Bölüm 5 · "Ünlü robot" (~50 sn, TV stüdyosu)
+### Bölüm 5 · "Ünlü robot" (~38 sn, TV stüdyosu)
 **Anlatım:**
 > Önceki bölümde Demlik, mahallenin kuru parkına yağmur yağdırdı. Ertesi gün ülkenin en ünlü robotuydu. Muhabir Sevgi sordu: Demlik, sırrın ne? Demlik tek kelime söyledi: Çay? Stüdyo alkıştan yıkıldı. İmza istendi, fotoğraf çekildi, şarkı yapıldı. Tahsin ise kenarda, kimse onu fark etmeden bekliyordu. Bir kere kenara çekilin dediler, Tahsin kenara çekildi. Ve o gece stüdyodan çıkarken, karanlıkta bir ses duyuldu: Demlik, benimle gel. Seni bütün dünyada ünlü yaparım. Silindir şapka parladı. Mükemmel Mümtaz geri dönmüştü.
 
 **Çekimler:** genis stüdyo, ışıklar, "CANLI" tabelası → orta Sevgi + Demlik → genis seyirciler alkış (`stars`, `hearts`) → orta Tahsin kenarda `sad`, kalabalık onu iter → genis gece stüdyo çıkışı, sokak lambası → **cliffhanger:** orta Mümtaz gölgeden çıkar, elini uzatır, Demlik'in gözleri `OO`.
 
-### Bölüm 6 · "Git o zaman!" (~50 sn, atölye, gece)
+### Bölüm 6 · "Git o zaman!" (~38 sn, atölye, gece)
 **Anlatım:**
 > Önceki bölümde Mükemmel Mümtaz, Demlik'e büyük bir teklif yaptı. Demlik o gece atölyeye döndü ve Tahsin'e baktı. Tahsin kırgındı. Bütün gün kimse onu görmemişti. Ağzından istemeden çıktı: Madem o kadar ünlüsün, git o zaman! Demlik'in gözleri yavaşça söndü. Çünkü Demlik, her şeyi harfi harfine anlardı. Kapı kapandı. Atölye hiç bu kadar sessiz olmamıştı. Tahsin sabaha kadar uyumadı. Sonra masanın altında bir şey gördü: Demlik'in yedek anteni. Ve anten yanıp sönüyordu. Kısa, kısa, kısa. Uzun, uzun, uzun. Kısa, kısa, kısa.
 
 **Çekimler:** genis atölye gece, tek lamba → orta Tahsin & Demlik yüz yüze → yakin Tahsin `angry` ("git o zaman") → orta Demlik gözler söner, döner, çıkar (kapı) → genis boş atölye, Tahsin masada `sad`, `zzz` yok → orta masa altı anten → **cliffhanger:** yakin anten S.O.S. yanıp söner (kırmızı ışık ritmi), Tahsin `shock`.
 **Not:** Ses efekti "beep" yerine `tick` ritmiyle SOS (... --- ...).
 
-### Bölüm 7 · "Mümtaz'ın fabrikası" (~50 sn, fabrika)
+### Bölüm 7 · "Mümtaz'ın fabrikası" (~38 sn, fabrika)
 **Anlatım:**
 > Önceki bölümde Tahsin, Demlik'ten bir yardım çağrısı aldı. Sinyal onu şehrin dışındaki dev bir fabrikaya götürdü. Pencereden içeri baktı ve gözlerine inanamadı. Demlik bir masaya bağlanmıştı. Ve bantta, onun aynısı yüzlerce robot ilerliyordu. Gri, soğuk, kırmızı gözlü kopyalar. Mümtaz kahkaha attı: Bir Demlik ünlüyse, yüz Demlik dünyayı yönetir! Ama Mümtaz bir şeyi bilmiyordu: kopyalar da her şeyi harfi harfine anlıyordu. Bir işçi şaka yollu, hadi şehri bir alt üst edin, dedi. Ve yüzlerce kırmızı göz aynı anda yandı.
 
 **Çekimler:** genis gece yol, uzakta fabrika (büyük kutu, baca, ışıklı pencere) → orta Tahsin pencereden bakar → genis fabrika içi, bant, kopya sırası (instancing yerine 20-30 aktör/grup, uzakta) → orta Demlik masada, gözler `;;` → orta Mümtaz `laugh` (`dramatic` ışık) → **cliffhanger:** genis kopyaların gözleri sırayla kırmızı yanar (`emissive`), kapılar açılır.
 
-### Bölüm 8 · "Kopya istilası" (~50 sn, şehir meydanı)
+### Bölüm 8 · "Kopya istilası" (~38 sn, şehir meydanı)
 **Anlatım:**
 > Önceki bölümde yüzlerce kopya robot, şehri alt üst etmek için yola çıktı. Ve ettiler. Biri yolu açın dedi, kopyalar asfaltı söküp kaldırdı. Biri ortalığı aydınlatın dedi, bütün lambaları aynı anda patlattılar. Saat kulesinin akrebi ile yelkovanı yer değiştirdi. Tahsin, annesi, Çaycı Rıza ve Minik Ece meydanda buluştu. Ne yapacaktık? Tahsin düşündü, düşündü… ve anladı. Kopyalar Demlik'in sesini taklit ediyordu. Onları ancak gerçek Demlik durdurabilirdi. Ama Ece kötü haberi getirdi: Televizyonda dediler… Mümtaz, Demlik'in hafızasını silmiş.
 
 **Çekimler:** genis meydan kaos (kopyalar asfalt parçası taşır, `dust`) → orta lambalar (`burst` sırası) → genis saat kulesi, kollar ters → orta dörtlü ekip toplanır (Tahsin, Anne, Rıza, Ece) → orta Tahsin `think` → `idea` → **cliffhanger:** yakin Ece `sad`, elinde gazete/kart "HAFIZA SİLİNDİ".
 
-### Bölüm 9 · "Hatırla" (~55 sn, fabrika → atölye ışığı)
+### Bölüm 9 · "Hatırla" (~42 sn, fabrika → atölye ışığı)
 **Anlatım:**
 > Önceki bölümde Tahsin, Demlik'in hafızasının silindiğini öğrendi. Gece fabrikaya gizlice girdi. Demlik oradaydı ama gözleri boştu. Tahsin, sana sırrımızı söyleyeceğim, dedi ve cebinden bir şey çıkardı: hiç soğumayan o çay bardağı. Buhar havaya yükseldi. Demlik'in ekranı bir kere titredi. Sonra bir daha. Atölye, babaanne, ilk kelime… Ve Demlik konuştu: Çay? Tahsin ağladı, Demlik zıpladı. Ama alarm çaldı. Mümtaz koşarak geldi, dev şalterin başına geçti ve bağırdı: Hepsini çalıştırıyorum! Şalter indi. Bütün kopyalar şehrin merkezine doğru yürümeye başladı.
 
 **Çekimler:** genis fabrika gece, mavi ışık → orta Tahsin gizlice (`walk`, `look`) → orta Demlik gözler gri → yakin hiç soğumayan bardak, buhar (1. bölüme gönderme) → orta Demlik ekranı titrer, gözler `^^`, `sparkle` → orta sarılma (`hearts`) → genis alarm (`dramatic`, kırmızı ışık) → **cliffhanger:** orta Mümtaz dev şalteri indirir (`shake`), kopyalar yürür.
 
-### Bölüm 10 · "Son demleme" (~55 sn, şehir meydanı)
+### Bölüm 10 · "Son demleme" (~42 sn, şehir meydanı)
 **Anlatım:**
 > Önceki bölümde Demlik hafızasını geri kazandı ama Mümtaz bütün kopyaları çalıştırdı. Meydanda yüzlerce kırmızı göz. Demlik en yüksek kuleye çıktı. Bütün kopyalar ona baktı. Ve Demlik, hayatının en uzun cümlesini söyledi: Mola. Çay saati. Çünkü kopyalar da her şeyi harfi harfine anlıyordu. Hepsi durdu, oturdu ve demlemeye başladı. Bütün şehir aynı anda çay içti. Mümtaz bile. Bir yudum aldı ve ilk kez gülümsedi: Belki de daha büyüğü değil, daha sıcağı lazımdı. Gerçekte robot kelimesi ilk kez 1920'de bir tiyatro oyununda kullanıldı ve Çekçe zorla çalıştırma anlamına geliyordu. Demlik ise sadece bir dost istiyordu. Peki sen olsan robotuna ilk ne söylerdin?
 
