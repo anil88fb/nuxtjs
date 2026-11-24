@@ -170,5 +170,13 @@ yapıyı buradan al (çekim listesi, `kadraj.js` ile kameralar, buhar, kart over
   `youtubeData: {title, type: "short", privacy: "public", tags: [...], category: "FILM_ANIMATION",
   madeForKids: false, isAiGeneratedContent: false}`. Kapak için `videoCoverMilliseconds` verme (Shorts'ta
   kanal doğrulanmadan reddedilebilir).
+- **TikTok (kullanıcı kararı 2026-11-24):** Aynı MP4'ü TikTok'a AYRI bir gönderiyle de planla. Hesap: Metricool
+  markasında `tiktokData` = "Sende-Katıl" olmalı (değilse TikTok'u atla, YouTube'a devam et). Saat: 10:00 slotunun
+  videosu TikTok'ta **10:00**, 16:00 slotunun videosu TikTok'ta **18:00** (TikTok en iyi saatleri). `providers:
+  [{"network":"tiktok"}]`, `text` = kısa TikTok açıklaması (soru + "Sen olsan ne yapardın? 👇" + kurgu notu +
+  `#TuhafTahsin #yaolsaydı #animasyon #keşfet` + konuya özel 1 etiket), `tiktokData: {privacyOption:
+  "PUBLIC_TO_EVERYONE", title: <YouTube başlığı, #Shorts'suz>, isAigc: true, autoAddMusic: false, disableComment:
+  false, disableDuet: false, disableStitch: false, commercialContentThirdParty: false, commercialContentOwnBrand:
+  false}`. Önce o TikTok slotunda (±30 dk) gönderi var mı bak; varsa TikTok'u atla.
 - **Aynı slota iki video koyma:** göndermeden önce `getScheduledPosts` ile o günün slotunu kontrol et.
 - Konu sırası `konular.md`'de; kullanılan konuyu işaretle, `bolumler.md`'ye satır ekle, commit + push.
