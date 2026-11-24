@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kediler vs Köpekler</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="stage">
+    <header id="top">
+      <div class="title"><span class="cat">🐱 KEDİLER</span><span class="vs">VS</span><span class="dog">KÖPEKLER 🐶</span></div>
+      <div class="scorebar">
+        <div class="score cat" id="scoreCat">0</div>
+        <div class="roundinfo"><div id="roundLabel">TUR 1</div><div id="timer">1:30</div></div>
+        <div class="score dog" id="scoreDog">0</div>
+      </div>
+    </header>
+
+    <div id="howto">Yorum yaz: <b class="cat">KEDİ</b> ya da <b class="dog">KÖPEK</b> → takımına katıl!<br>Sonra her yorumun halatı çeker 💪</div>
+
+    <canvas id="arena" width="1080" height="820"></canvas>
+
+    <div id="power">
+      <div class="fill cat" id="powerCat"></div>
+      <div class="fill dog" id="powerDog"></div>
+      <div class="labels"><span id="pctCat">%50</span><span id="teamCounts">🐱 0 oyuncu · 0 oyuncu 🐶</span><span id="pctDog">%50</span></div>
+    </div>
+
+    <div id="banner" class="hidden"></div>
+    <div id="center" class="hidden"></div>
+
+    <section id="lower">
+      <div id="leaders"><h3>🏆 Turun Yıldızları</h3><ol id="leaderList"></ol></div>
+      <div id="rules">
+        <div>💬 Yorum = <b>çekiş</b></div>
+        <div>❤️ Beğeni = <b>mini çekiş</b></div>
+        <div>🎁 Hediye = <b>SÜPER ÇEKİŞ</b></div>
+        <div>➕ Takip / ↗️ Paylaş = <b>+5</b></div>
+        <div>⏱️ Son 10 sn = <b>güç x2</b></div>
+      </div>
+    </section>
+    <ul id="feed"></ul>
+
+    <div id="status"></div>
+    <div id="testpanel" class="hidden">
+      TEST · <b>K</b> kedi katılır · <b>D</b> köpek katılır · <b>1</b>/<b>2</b> çekiş · <b>G</b> hediye · <b>L</b> beğeni · <b>F</b> takip · <b>S</b> fırtına · <b>R</b> skoru sıfırla · <b>M</b> ses
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

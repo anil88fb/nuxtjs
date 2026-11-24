@@ -1,0 +1,20 @@
+{
+  "name": "kediler-vs-kopekler",
+  "version": "1.0.0",
+  "description": "TikTok LIVE yorumlarıyla oynanan halat çekme oyunu",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "demo": "node server.js --demo"
+  },
+  "dependencies": {
+    "express": "^4.22.3",
+    "socket.io": "^4.8.4",
+    "tiktok-live-connector": "^2.5.0"
+  },
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  }
+}
