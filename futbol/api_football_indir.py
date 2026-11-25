@@ -16,10 +16,10 @@ Notlar:
 - Ek kurulum gerekmez (sadece Python 3).
 - Sezon otomatik seçilir (Temmuz ve sonrası -> o yıl, öncesi -> bir önceki yıl).
   Elle vermek için: python api_football_indir.py --sezon 2026
-- Ligler: Türkiye Süper Lig, Türkiye 1. Lig, Premier League, La Liga,
+- Ligler: Türkiye Süper Lig, Premier League, La Liga,
   Serie A, Bundesliga, Ligue 1.
-- Ücretsiz pakette günlük 100 istek sınırı var. Toplam ~140 istek gerekir
-  (7 lig + her takım için 1 kadro isteği), yani 2 günde tamamlanır.
+- Ücretsiz pakette günlük 100 istek sınırı var. Toplam ~120 istek gerekir
+  (6 lig + her takım için 1 kadro isteği), yani 2 günde tamamlanır.
   Sınıra gelince script durur; ertesi gün aynı komutu çalıştırınca
   kaldığı yerden devam eder (önbellek: cache/ klasörü).
 - Görsel indirmeleri (logo/foto) istek sınırına sayılmaz.
@@ -49,7 +49,6 @@ SEZON = guncel_sezon()
 
 LIGLER = {
     203: "Turkiye_Super_Lig",
-    204: "Turkiye_1_Lig",
     39: "Ingiltere_Premier_League",
     140: "Ispanya_La_Liga",
     135: "Italya_Serie_A",
