@@ -18,8 +18,9 @@ Notlar:
   Elle vermek için: python api_football_indir.py --sezon 2026
 - Ligler: Türkiye Süper Lig, Premier League, La Liga,
   Serie A, Bundesliga, Ligue 1.
-- Ücretsiz pakette günlük 100 istek sınırı var. Toplam ~120 istek gerekir
-  (6 lig + her takım için 1 kadro isteği), yani 2 günde tamamlanır.
+- Her ligden puan durumuna göre ilk 5 takım alınır (TAKIM_SAYISI ile değişir).
+- Ücretsiz pakette günlük 100 istek sınırı var. Toplam ~42 istek gerekir
+  (6 lig x 2 istek + 30 takım x 1 kadro isteği), yani tek günde biter.
   Sınıra gelince script durur; ertesi gün aynı komutu çalıştırınca
   kaldığı yerden devam eder (önbellek: cache/ klasörü).
 - Görsel indirmeleri (logo/foto) istek sınırına sayılmaz.
@@ -55,6 +56,8 @@ LIGLER = {
     78: "Almanya_Bundesliga",
     61: "Fransa_Ligue_1",
 }
+
+TAKIM_SAYISI = 5  # her ligden puan durumunda ilk kaç takım alınsın
 
 ANAHTAR = os.environ.get("APIFOOTBALL_KEY", "").strip()
 CACHE = "cache"
@@ -119,16 +122,36 @@ def indir(url, hedef):
         print(f"  ! Görsel indirilemedi: {url} ({e})")
 
 
+def ilk_siradakiler(lig_id):
+    """Puan durumuna göre ilk TAKIM_SAYISI takımın {id: sıra} sözlüğü."""
+    veri = api_get("standings", {"league": lig_id, "season": SEZON})
+    try:
+        tablo = veri["response"][0]["league"]["standings"][0]
+    except (KeyError, IndexError, TypeError):
+        return {}
+    tablo = sorted(tablo, key=lambda x: x.get("rank") or 999)[:TAKIM_SAYISI]
+    return {x["team"]["id"]: x.get("rank") for x in tablo}
+
+
 def takimlar():
     liste = []
     for lig_id, lig_ad in LIGLER.items():
         print(f"[Takımlar] {lig_ad}")
+        siralar = ilk_siradakiler(lig_id)
         veri = api_get("teams", {"league": lig_id, "season": SEZON})
-        for k in veri.get("response", []):
+        kayitlar = veri.get("response", [])
+        if siralar:
+            kayitlar = sorted((k for k in kayitlar if k["team"]["id"] in siralar),
+                              key=lambda k: siralar[k["team"]["id"]])
+        else:
+            print(f"  ! Puan durumu alınamadı, ilk {TAKIM_SAYISI} takım alınıyor.")
+            kayitlar = kayitlar[:TAKIM_SAYISI]
+        for k in kayitlar:
             t, s = k["team"], k.get("venue") or {}
             logo = os.path.join("logolar", lig_ad, temiz(t["name"]) + ".png")
             indir(t.get("logo"), os.path.join(CIKTI, logo))
-            liste.append({"lig": lig_ad, "takim_id": t["id"], "takim": t["name"],
+            liste.append({"lig": lig_ad, "sira": siralar.get(t["id"]),
+                          "takim_id": t["id"], "takim": t["name"],
                           "ulke": t.get("country"), "kurulus": t.get("founded"),
                           "stadyum": s.get("name"), "sehir": s.get("city"),
                           "logo_dosya": logo, "logo_url": t.get("logo")})
