@@ -95,6 +95,9 @@ def api_get(yol, params):
         kucuk = metin.lower()
         if "limit" in kucuk or "requests" in kucuk:
             raise LimitDoldu()
+        if "suspended" in kucuk or "access" in kucuk or "token" in kucuk:
+            sys.exit(f"\nAPI hesabı/anahtarı kullanılamıyor: {metin}\n"
+                     "dashboard.api-football.com adresinden hesabını kontrol et.")
         if "plan" in kucuk or "season" in kucuk:
             sys.exit(f"\nAPI bu sezona erişim vermiyor ({SEZON}): {metin}\n"
                      "Ücretsiz paket güncel sezonu kapsamıyor olabilir. "
